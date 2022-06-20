@@ -1,0 +1,32 @@
+---
+title: "`r params$title`"
+date: "`r format(Sys.time(), '%d %B, %Y')`" 
+output: html_document
+params:
+  title: BRINDA Adjustment Report
+  data: NULL
+  plot: NULL
+---
+
+# Input Data
+
+The input data has `r nrow(params$data)` samples and `r ncol(params$data)` observations per sample. The following micronutrients in your data set had the following aliases in your data:
+
+* Retinol Binding Protein: `r params$rbp`
+* Retinol : `r params$rt`
+* Ferritin: `r params$ft`
+* Soluble Transferrin Receptor: `r params$stfr`
+* Serum Zinc: `r params$zn`
+* AGP: `r params$agp`
+* CRP: `r params$crp`
+          selectInput("rt","Retinol",choices = NULL),
+          selectInput("ft","Ferritin",choices = NULL),
+          selectInput("stfr","Soluble Transferrin Receptor",choices = NULL),
+          selectInput("zn","Serum Zinc",choices = NULL),
+          selectInput("agp","AGP",choices = NULL),
+          selectInput("crp","CRP",choices = NULL),
+
+
+```{r head,echo=FALSE,warning=F,message=FALSE}
+
+```
