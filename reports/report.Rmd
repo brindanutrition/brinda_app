@@ -84,7 +84,7 @@ if(population == "PSC"){
 }
 ```
 
-* Popultaion : `r population`
+* Population : `r population`
 * Reference AGP : `r refAgp`
 * Reference CRP : `r refCrp`
 
