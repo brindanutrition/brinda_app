@@ -603,10 +603,8 @@ observe({
   })
 ##############################################################################
 ## Plot cutoff density plots
-  output$rbpPlotC <- renderPlot({
+  rbpPlotCf <- function(){
     req(input$rbp)
-    library(ggplot2)
-    library(RColorBrewer)
     cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rbp)]])) +
       geom_density(fill=cols[1],color="darkslategrey")+
@@ -615,11 +613,12 @@ observe({
       ylab("")+
       xlab("")+
       geom_vline(xintercept = as.numeric(input$rbpC),color="red")
+  }
+  output$rbpPlotC <- renderPlot({
+    print(rbpPlotCf())
   })
-  output$rtPlotC <- renderPlot({
+  rtPlotCf <- function(){
     req(input$rt)
-    library(ggplot2)
-    library(RColorBrewer)
     cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rt)]])) +
       geom_density(fill=cols[2],color="darkslategrey")+
@@ -628,11 +627,12 @@ observe({
       ylab("")+
       xlab("")+
       geom_vline(xintercept = as.numeric(input$rtC),color="red")
+  }
+  output$rtPlotC <- renderPlot({
+    print(rtPlotCf())
   })
-  output$ftPlotC <- renderPlot({
+  ftPlotCf <- function(){
     req(input$ft)
-    library(ggplot2)
-    library(RColorBrewer)
     cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$ft)]])) +
       geom_density(fill=cols[3],color="darkslategrey")+
@@ -641,11 +641,12 @@ observe({
       ylab("")+
       xlab("")+
       geom_vline(xintercept = as.numeric(input$ftC),color="red")
+  }
+  output$ftPlotC <- renderPlot({
+    print(ftPlotCf())
   })
-  output$stfrPlotC <- renderPlot({
+  stfrPlotCf <- function(){
     req(input$stfr)
-    library(ggplot2)
-    library(RColorBrewer)
     cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$stfr)]])) +
       geom_density(fill=cols[5],color="darkslategrey")+
@@ -654,11 +655,12 @@ observe({
       ylab("")+
       xlab("")+
       geom_vline(xintercept = as.numeric(input$stfrC),color="red")
+  }
+  output$stfrPlotC <- renderPlot({
+    print(stfrPlotCf())
   })
-  output$znPlotC <- renderPlot({
+  znPlotCf <- function(){
     req(input$zn)
-    library(ggplot2)
-    library(RColorBrewer)
     cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$zn)]])) +
       geom_density(fill=cols[5],color="darkslategrey")+
@@ -667,6 +669,9 @@ observe({
       ylab("")+
       xlab("")+
       geom_vline(xintercept = as.numeric(input$znC),color="red")
+  }
+  output$znPlotC <- renderPlot({
+    print(znPlotCf())
   })
 ################################################################################ Apply BRINDA adjustment
   ## make brinda variable available outside observe statement
@@ -989,7 +994,29 @@ observe({
                     switch(
         input$format,
         PDF = pdf_document(), HTML = html_document(), Word = word_document()),
-        params = list(data = imported$data()))
+        params = list(data = imported$data(),
+                      rbp = input$rbp,
+                      rt = input$rt,
+                      ft = input$ft,
+                      stfr = input$stfr,
+                      zn = input$zn,
+                      agp = input$agp,
+                      crp = input$crp,
+                      pop = input$pop,
+                      rbpC = input$rbpC,
+                      rtC = input$rtC,
+                      ftC = input$ftC,
+                      stfrC = input$stfrC,
+                      znC = input$znC,
+                      rbpPlotCf = rbpPlotCf(),
+                      rtPlotCf = rtPlotCf(),
+                      ftPlotCf = ftPlotCf(),
+                      stfrPlotCf = stfrPlotCf(),
+                      znPlotCf = znPlotCf(),
+                      refAgp = input$refAgp,
+                      refCrp = input$refCrp,
+                      bar = bar(),
+                      density = density()))
       file.rename(out, file)
     }
   )
