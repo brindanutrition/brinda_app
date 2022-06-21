@@ -6,27 +6,93 @@ params:
   title: BRINDA Adjustment Report
   data: NULL
   plot: NULL
+  rbp: NULL
+  rt: NULL
+  ft: NULL
+  stfr: NULL
+  zn: NULL
+  agp: NULL
+  crp: NULL
+  pop: NULL
+  rbpC: NULL
+  rtC: NULL
+  ftC: NULL
+  stfrC: NULL
+  znC: NULL
+  rbpPlotCf: NULL
+  rtPlotCf: NULL
+  ftPlotCf: NULL
+  stfrPlotCf: NULL
+  znPlotCf: NULL
+  refAgp : NULL
+  refCrp :  NULL
+  bar : NULL
+  density : NULL
 ---
 
-# Input Data
+## Input Data
 
-The input data has `r nrow(params$data)` samples and `r ncol(params$data)` observations per sample. The following micronutrients in your data set had the following aliases in your data:
+The input data has `r nrow(params$data)` samples and `r ncol(params$data)` observations per sample. The following micronutrients were assigned to the column names listed below:
 
-* Retinol Binding Protein: `r params$rbp`
-* Retinol : `r params$rt`
-* Ferritin: `r params$ft`
-* Soluble Transferrin Receptor: `r params$stfr`
-* Serum Zinc: `r params$zn`
-* AGP: `r params$agp`
-* CRP: `r params$crp`
-          selectInput("rt","Retinol",choices = NULL),
-          selectInput("ft","Ferritin",choices = NULL),
-          selectInput("stfr","Soluble Transferrin Receptor",choices = NULL),
-          selectInput("zn","Serum Zinc",choices = NULL),
-          selectInput("agp","AGP",choices = NULL),
-          selectInput("crp","CRP",choices = NULL),
+| Micronutrient | Assigned Column Name |
+|-|-|
+| Retinol Binding Protein| `r params$rbp` |
+| Retinol | `r params$rt` |
+| Ferritin | `r params$ft` |
+| Soluble Transferrin Receptor | `r params$stfr` |
+| Serum Zinc | `r params$zn` |
+| AGP | `r params$agp` |
+| CRP | `r params$crp` |                                          
+
+## Value Cutoffs
+
+The following cutoff was applied to the micronutrients below. Micronutrients with a level below the cutoff were not adjusted using the BRINDA method:
+
+| Micronutrient | Value Cutoff |
+|-|-|
+| Retinol Binding Protein| `r params$rbpC` |
+| Retinol | `r params$rtC` |
+| Ferritin | `r params$ftC` |
+| Soluble Transferrin Receptor | `r params$stfrC` |
+| Serum Zinc | `r params$znC` |
 
 
-```{r head,echo=FALSE,warning=F,message=FALSE}
+```{r cutoff,echo=FALSE,warning=F,message=FALSE}
+library(patchwork)
+library(ggplot2)
+(params$rbpPlotCf / params$rtPlotCf / params$ftPlotCf) | ( params$stfrPlotCf / params$znPlotCf /ggplot() + theme_void())
+```
 
+## Population Group
+
+Micronutrient values are adjusted per population group and as such reference AGP and CRP values are set accordingly. The population group, reference AGP, and reference CRP were set to the following:
+
+```{r population,echo=FALSE,warning=F,message=FALSE}
+population = params$pop
+if(population == "PSC"){
+  refAgp = "-0.52"
+  refCrp = "-2.26"
+}else if(population == "WRA"){
+  refAgp = "-0.62"
+  refCrp = "-1.83"
+}else if(population == "Manual"){
+  refAgp = "lowest decile of AGP"
+  refCrp = "lowest decile of CRP"
+}else if(population == "Other"){
+  refAgp = params$refAgp
+  refCrp = params$refCrp
+}
+```
+
+* Popultaion : `r population`
+* Reference AGP : `r refAgp`
+* Reference CRP : `r refCrp`
+
+## BRINDA Adjustment
+
+The micronutrient values have been adjusted and the difference between adjusted and unadjusted values are displayed below:
+
+```{r adjustment,echo=FALSE,warning=F,message=FALSE}
+library(patchwork)
+params$bar/params$density
 ```
