@@ -3,13 +3,13 @@ library(ggplot2)
 library(datamods)
 library(shinydashboard)
 library(ggplot2)
-library(RColorBrewer)
 library(shinyalert)
 library(DT)
 library(dplyr)
 library(ggridges)
 library(BRINDA)
 library(fresh)
+#sapply(paste("./R/",list.files(path = "./R/"),sep=""),source,.GlobalEnv)
 #############################################################################
 ## Shiny theme
 mytheme <- create_theme(
@@ -49,166 +49,69 @@ body <- dashboardPage(
     tags$style(".left-side, .main-sidebar {padding-top: 100px;}"),
     use_theme(mytheme),
     width = 300,
-    # sidebarMenu(
-    #   id="sider",
-    #   menuItem("Step 1: Import Data",
-    #     tabName = "import",
-    #     icon = icon("cloud-upload"),
-    #     badgeLabel = "Step 1",
-    #     badgeColor = "yellow"
-    #   ),
-    #   menuItemOutput("step2"),
-    #   menuItemOutput("step3"),
-    #   menuItemOutput("step4"),
-    #   menuItemOutput("step5")
-    # )
     sidebarMenuOutput("sidebarmenu")
     ),
 #############################################################################
 ## body
   dashboardBody(
+    tags$style("
+              body {
+    -moz-transform: scale(1.1, 1.1); /* Moz-browsers */
+    zoom: 1.1; /* Other non-webkit browsers */
+    zoom: 110%; /* Webkit browsers */
+}
+              "),
     use_theme(mytheme),
     tabItems(
 #############################################################################
 ## Import Data
       tabItem(
         tabName = "import",
-        fluidRow(
-          box(
-            title=div(icon("table"),"Data Table"),
-            width = 10,
-            color="#301014",
-            status = "primary", solidHeader = TRUE,
-            actionButton("importData",
-                         "Step 1: Import Data",
-                         icon = icon("cloud-upload"),
-                         style="background-color: #301014;color:white;"),
-            br(""),
-            dataTableOutput("table")
-          )
-        )
+        source(
+          file = "ui_import.R",
+          local = TRUE,
+          encoding = "UTF-8"
+        )$value
       ),
 #############################################################################
 ## Select Markers
       tabItem(
         tabName = "select",
-        box(
-          title = div(icon("list"),"Select Markers"),
-          width = 4,
-          status = "primary",
-          solidHeader = TRUE,
-          selectInput("rbp","Retinol Binding Protein",choices = NULL),
-          selectInput("rt","Retinol",choices = NULL),
-          selectInput("ft","Ferritin",choices = NULL),
-          selectInput("stfr","Soluble Transferrin Receptor",choices = NULL),
-          selectInput("zn","Serum Zinc",choices = NULL),
-          selectInput("agp","AGP",choices = NULL),
-          selectInput("crp","CRP",choices = NULL),
-          selectInput("pop","Population",choices = c("","WRA", "PSC", "Other","Manual")),
-          uiOutput("manAgp"),
-          uiOutput("manCrp")
-        ),
-        box(
-          title = div(icon("check"),"Set Markers"),
-          width = 6,
-          status = "primary",
-          solidHeader = TRUE,
-          actionButton("setMarkers",
-                       "Set Markers",
-                       icon = icon("check"),
-                       style="background-color: #301014;color:white;"),
-          br(""),
-          plotOutput("rbpPlot",height = 115),
-          plotOutput("rtPlot",height = 115),
-          plotOutput("ftPlot",height = 115),
-          plotOutput("stfrPlot",height = 115),
-          plotOutput("znPlot",height = 115),
-        )
+        source(
+          file = "ui_select.R",
+          local = TRUE,
+          encoding = "UTF-8"
+        )$value
       ),
 #############################################################################
 ## Select Cutoff
       tabItem(
         tabName = "cutoff",
-        box(
-          title = div(icon("filter"),"Optional: Apply Cutoff"),
-          width = 4,
-          status = "primary",
-          solidHeader = TRUE,
-          textInput("rbpC","Retinol Binding Protein Cutoff",value = 0),
-          textInput("rtC","Retinol Cutoff",value = 0),
-          textInput("ftC","Ferritin Cutoff" ,value = 0),
-          textInput("stfrC","Soluble Transferrin Receptor Cutoff",value = 0),
-          textInput("znC","Serum Zinc Cutoff",value = 0)
-        ),
-        box(
-          title = div(icon("filter"),"Set Cutoff"),
-          width = 6,
-          status = "primary",
-          solidHeader = TRUE,
-          actionButton("setCutoff",
-                       "Set Cutoff",
-                       icon = icon("check"),
-                       style="background-color: #301014;color:white;"),
-          br(""),
-          plotOutput("rbpPlotC",height = 115),
-          plotOutput("rtPlotC",height = 115),
-          plotOutput("ftPlotC",height = 115),
-          plotOutput("stfrPlotC",height = 115),
-          plotOutput("znPlotC",height = 115)
-        )
+        source(
+          file = "ui_cutoff.R",
+          local = TRUE,
+          encoding = "UTF-8"
+        )$value
       ),
 #############################################################################
 ## Run BRINDA Adjustment
       tabItem(
         tabName = "brinda",
-        fluidRow(
-          box(
-            title = div(icon("calculator"),"BRINDA"),
-            width = 12,
-            status = "primary",
-            solidHeader = TRUE,
-            tabBox(
-              width = 12,
-              tabPanel(
-                title = div(icon("calculator"),"BRINDA"),
-                actionButton("applyBrinda",
-                             "Apply BRINDA Adjustment",
-                             icon = icon("check"),
-                             style="background-color: #301014;color:white;"),
-                dataTableOutput("brindaTbl"),
-                downloadButton("downloadRes","Download",
-                               style="background-color: #301014;color:white;align:right")
-              ),
-              tabPanel(
-                title = div(icon("chart-bar"),"Bar Plot"),
-                plotOutput("barplot"),
-                downloadButton("downloadBar","Download",
-                               style="background-color: #301014;color:white;align:right")
-              ),
-              tabPanel(
-                title = div(icon("chart-area"),"Density Plot"),
-                plotOutput("densityplot"),
-                downloadButton("downloadDensity","Download",
-                               style="background-color: #301014;color:white;align:right")
-              )
-              )))
+        source(
+          file = "ui_brinda.R",
+          local = TRUE,
+          encoding = "UTF-8"
+        )$value
       ),
 #############################################################################
 ## Generate Report
       tabItem(
         tabName = "report",
-        box( 
-          title = div(icon("file"),"Generate Report"),
-          width = 4,
-          status = "primary",
-           solidHeader = TRUE,
-          radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'),
-                       inline = TRUE),
-          downloadButton("report","Generate Report",
-                         icon = icon("play"),
-                         style="background-color: #301014;color:white;")
-          # downloadButton("report", "Generate report")
-          )
+        source(
+          file = "ui_report.R",
+          local = TRUE,
+          encoding = "UTF-8"
+        )$value
         )
 #############################################################################
     )
@@ -237,68 +140,16 @@ server <- function(input, output, session) {
   output$table <- renderDataTable({
     req(imported$data())
     df <- imported$data()
-    brks <- quantile(df[,sapply(df,is.numeric)], 
-                     probs = seq(.05, .95, .05),
-                     na.rm = TRUE)
-    clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
-      {paste0("rgb(255,", ., ",", ., ")")}
-    
-    datatable(df,options = list(scrollX = T)) %>% 
-      formatStyle(names(df)[sapply(df,is.numeric)],
-                  backgroundColor = styleInterval(brks, clrs))
+    datatable(df,options = list(scrollX = T,lengthMenu=c(5,10,25)))
   })
 #############################################################################
 ## Update Sidebar depending on what 
 ## step you are on
-# observeEvent(input$importData,{
-#   req(input$importData)
-#   output$step2 <- renderMenu({
-#     menuItem("Step 2: Select Markers",
-#              tabName = "select",
-#              icon = icon("list"),
-#              badgeLabel = "Step 2",
-#              badgeColor = "orange"
-#     )
-#   })
-# })
-#   observeEvent(input$setMarkers,{
-#     req(input$setMarkers)
-#     output$step3 <- renderMenu({
-#       menuItem("Step 3: Optional: Apply Cutoff",
-#                tabName = "cutoff",
-#                icon = icon("filter"),
-#                badgeLabel = "Step 3",
-#                badgeColor = "maroon"
-#       )
-#     })
-#   })
-#   observeEvent(input$setCutoff,{
-#     req(input$setCutoff)
-#     output$step4 <- renderMenu({
-#       menuItem("Step 4: Run BRINDA Adjustment",
-#                tabName = "brinda",
-#                icon =  icon("calculator"),
-#                badgeLabel = "Step 4",
-#                badgeColor = "maroon"
-#       )
-#     })
-#   })
-#   observeEvent(input$applyBrinda,{
-#     req(input$applyBrinda)
-#     output$step5 <- renderMenu({
-#       menuItem("Step 5: Report",
-#                tabName = "report",
-#                icon =  icon("file"),
-#                badgeLabel = "Step 5",
-#                badgeColor = "fuchsia"
-#       )
-#     })
-#   })
-
 observe({
   observeEvent(1==1,{
     output$sidebarmenu <- renderMenu({
       sidebarMenu(
+        id = "tabs",
         menuItem("Step 1: Import Data",
                  tabName = "import",
                  icon = icon("cloud-upload"),
@@ -331,6 +182,7 @@ observe({
   observeEvent(input$importData,{
     output$sidebarmenu <- renderMenu({
       sidebarMenu(
+        id = "tabs",
         menuItem("Step 1: Import Data",
                  tabName = "import",
                  icon = icon("cloud-upload"),
@@ -363,6 +215,7 @@ observe({
   observeEvent(input$setMarkers,{
     output$sidebarmenu <- renderMenu({
       sidebarMenu(
+        id = "tabs",
         menuItem("Step 1: Import Data",
                  tabName = "import",
                  icon = icon("cloud-upload"),
@@ -395,6 +248,7 @@ observe({
   observeEvent(input$setCutoff,{
     output$sidebarmenu <- renderMenu({
       sidebarMenu(
+        id = "tabs",
         menuItem("Step 1: Import Data",
                  tabName = "import",
                  icon = icon("cloud-upload"),
@@ -427,6 +281,7 @@ observe({
   observeEvent(input$applyBrinda,{
     output$sidebarmenu <- renderMenu({
       sidebarMenu(
+        id = "tabs",
         menuItem("Step 1: Import Data",
                  tabName = "import",
                  icon = icon("cloud-upload"),
@@ -458,6 +313,48 @@ observe({
   })
 })
 #############################################################################
+## Update Selected Tab Based on Previous/Next Buttons
+  observeEvent(input$prevImport,{
+    updateTabItems(session,
+                   "tabs",
+                   "import")
+  })
+  observeEvent(input$nextSelect,{
+    updateTabItems(session,
+                   "tabs",
+                   "select")
+  })
+  observeEvent(input$prevSelect,{
+    updateTabItems(session,
+                   "tabs",
+                   "select")
+  })
+  observeEvent(input$nextCutoff,{
+    updateTabItems(session,
+                   "tabs",
+                   "cutoff")
+  })
+  observeEvent(input$prevCutoff,{
+    updateTabItems(session,
+                   "tabs",
+                   "cutoff")
+  })
+  observeEvent(input$nextBrinda,{
+    updateTabItems(session,
+                   "tabs",
+                   "brinda")
+  })
+  observeEvent(input$prevBrinda,{
+    updateTabItems(session,
+                   "tabs",
+                   "brinda")
+  })
+  observeEvent(input$nextReport,{
+    updateTabItems(session,
+                   "tabs",
+                   "report")
+  })
+#############################################################################
 ## Updates Column Names Per User's Data
 ## Dynamically removes options based on 
 ## user's previous choice as to not 
@@ -465,32 +362,40 @@ observe({
   observe({
     updateSelectInput(session, "rbp",
                       label = "Retinol Binding Protein",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$crp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$rbp)
     updateSelectInput(session, "rt",
                       label = "Retinol",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rbp,input$ft,input$stfr,input$zn,input$agp,input$crp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rbp,input$ft,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$rt)
     updateSelectInput(session, "ft",
                       label = "Ferritin",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$rbp,input$stfr,input$zn,input$agp,input$crp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$rbp,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$ft)
     updateSelectInput(session, "stfr",
                       label = "Soluble Transferrin Receptor",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$rbp,input$zn,input$agp,input$crp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$rbp,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$stfr)
     updateSelectInput(session, "zn",
                       label = "Serum Zinc",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$rbp,input$agp,input$crp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$rbp,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$zn)
     updateSelectInput(session, "agp",
                       label = "AGP",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$rbp,input$crp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$rbp,input$crp,input$fasting,input$time))]),
                       selected = input$agp)
     updateSelectInput(session, "crp",
                       label = "CRP",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp))]),
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting,input$time))]),
                       selected = input$crp)
+    updateSelectInput(session, "fasting",
+                      label = "Fasting Status",
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$time))]),
+                      selected = input$fasting)
+    updateSelectInput(session, "time",
+                      label = "Time of Day",
+                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting))]),
+                      selected = input$time)
   })
 #############################################################################
 ## Density Plots to be generated
@@ -602,76 +507,107 @@ observe({
     }
   })
 ##############################################################################
+## Cutoff Unit Output
+## Outputs the same unit as specified in step 2
+  output$rbpUnitC <- renderText({
+    req(input$rbpU)
+    input$rbpU
+  })
+  output$rtUnitC <- renderText({
+    req(input$rtU)
+    input$rtU
+  })
+  output$ftUnitC <- renderText({
+    req(input$ftU)
+    input$ftU
+  })
+  output$stfrUnitC <- renderText({
+    req(input$stfrU)
+    input$stfrU
+  })
+  output$zn_morn_fast_UnitC <- renderText({
+    req(input$znU)
+    input$znU
+  })
+  output$zn_morn_nonfast_UnitC <- renderText({
+    req(input$znU)
+    input$znU
+  })
+  output$zn_after_nonfast_UnitC <- renderText({
+    req(input$znU)
+    input$znU
+  })
+  ##############################################################################
+  ## Output Deficiency Definition Tables
+  output$defTbl <- renderTable({
+    deficiency <- read.csv("./data/deficiency.csv")
+    return(deficiency)
+  })
+  output$znDefTbl <- renderTable({
+    znDef <- read.csv("./data/znDef.csv")
+    return(znDef)
+  })
+##############################################################################
 ## Plot cutoff density plots
-  rbpPlotCf <- function(){
-    req(input$rbp)
-    cols <- brewer.pal(10,"Set3")
-    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rbp)]])) +
-      geom_density(fill=cols[1],color="darkslategrey")+
-      theme_minimal()+
-      ggtitle("Retinol Binding Protein")+
-      ylab("")+
-      xlab("")+
-      geom_vline(xintercept = as.numeric(input$rbpC),color="red")
+  # output$cutoffBar <- renderPlot({
+  #   print(cutoffBarPlot(
+  #     df = imported$data(),
+  #     rbp = input$rbp,
+  #     rt = input$rt,
+  #     ft = input$ft,
+  #     stfr = input$stfr,
+  #     zn = input$zn,
+  #     rbpC = input$rbpC,
+  #     rtC = input$rtC,
+  #     ftC = input$ftC,
+  #     stfrC = input$stfrC,
+  #     zn_morn_fast_C = input$zn_morn_fast_C,
+  #     zn_morn_nonfast_C = input$zn_morn_nonfast_C,
+  #     zn_after_nonfast_C = input$zn_after_nonfast_C,
+  #     fasting = input$fasting,
+  #     time = input$time
+  #   ))
+  # })
+  cutoffBarPlot <- function(){
+    rbp <-  imported$data() %>%
+      select(c(as.character(input$rbp),as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep(as.character(input$rbp),nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$rbp)]])<as.numeric(input$rbpC),"deficient","normal"))
+    sr <-imported$data() %>%
+      select(c(as.character(input$rt),as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep(as.character(input$rt),nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$rt)]])<as.numeric(input$rtC),"deficient","normal"))
+    sf <- imported$data() %>%
+      select(c(as.character(input$ft),as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep(as.character(input$ft),nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$ft)]])<as.numeric(input$ftC),"deficient","normal"))
+    stfr <-imported$data() %>%
+      select(c(as.character(input$stfr),as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep(as.character(input$stfr),nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$stfr)]])<as.numeric(input$stfrC),"deficient","normal"))
+    zn <- imported$data() %>%
+      select(c(as.character(input$zn),as.character(input$fasting),as.character(input$time)))%>%
+      mutate(biomarker=rep(as.character(input$zn),nrow(.)))%>%
+      mutate(deficient=ifelse(
+        (imported$data()[[as.character(input$fasting)]]=="fasting" & imported$data()[[as.character(input$time)]]=="morning" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_fast_C)) |
+          (imported$data()[[as.character(input$fasting)]]=="fasting" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_nonfast_C)) |
+          (imported$data()[[as.character(input$fasting)]]=="non-fasting" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_after_nonfast_C))
+        ,"deficient","normal"))
+    defDf <- rbind.data.frame(
+      rbp %>% select(biomarker,deficient),
+      sr %>% select(biomarker,deficient),
+      sf %>% select(biomarker,deficient),
+      stfr %>% select(biomarker,deficient),
+      zn %>% select(biomarker,deficient)
+    ) %>%
+      mutate(value=rep(1,nrow(.)))
+    ggplot(defDf, aes(x = biomarker, y= value, fill = deficient)) +
+      geom_bar(stat="identity", position = "stack", width = 0.5) +
+      theme_bw()
   }
-  output$rbpPlotC <- renderPlot({
-    print(rbpPlotCf())
-  })
-  rtPlotCf <- function(){
-    req(input$rt)
-    cols <- brewer.pal(10,"Set3")
-    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rt)]])) +
-      geom_density(fill=cols[2],color="darkslategrey")+
-      theme_minimal()+
-      ggtitle("Retinol")+
-      ylab("")+
-      xlab("")+
-      geom_vline(xintercept = as.numeric(input$rtC),color="red")
-  }
-  output$rtPlotC <- renderPlot({
-    print(rtPlotCf())
-  })
-  ftPlotCf <- function(){
-    req(input$ft)
-    cols <- brewer.pal(10,"Set3")
-    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$ft)]])) +
-      geom_density(fill=cols[3],color="darkslategrey")+
-      theme_minimal()+
-      ggtitle("Ferritin")+
-      ylab("")+
-      xlab("")+
-      geom_vline(xintercept = as.numeric(input$ftC),color="red")
-  }
-  output$ftPlotC <- renderPlot({
-    print(ftPlotCf())
-  })
-  stfrPlotCf <- function(){
-    req(input$stfr)
-    cols <- brewer.pal(10,"Set3")
-    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$stfr)]])) +
-      geom_density(fill=cols[5],color="darkslategrey")+
-      theme_minimal()+
-      ggtitle("Soluble Transferrin Receptor")+
-      ylab("")+
-      xlab("")+
-      geom_vline(xintercept = as.numeric(input$stfrC),color="red")
-  }
-  output$stfrPlotC <- renderPlot({
-    print(stfrPlotCf())
-  })
-  znPlotCf <- function(){
-    req(input$zn)
-    cols <- brewer.pal(10,"Set3")
-    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$zn)]])) +
-      geom_density(fill=cols[5],color="darkslategrey")+
-      theme_minimal()+
-      ggtitle("Zinc")+
-      ylab("")+
-      xlab("")+
-      geom_vline(xintercept = as.numeric(input$znC),color="red")
-  }
-  output$znPlotC <- renderPlot({
-    print(znPlotCf())
+  output$cutoffBar <- renderPlot({
+    req(input$setCutoff)
+    print(cutoffBarPlot())
   })
 ################################################################################ Apply BRINDA adjustment
   ## make brinda variable available outside observe statement
@@ -860,15 +796,7 @@ observe({
     req(input$applyBrinda)
     req(input$pop)
     df <- brinda()
-    brks <- quantile(df[,sapply(df,is.numeric)], 
-                     probs = seq(.05, .95, .05),
-                     na.rm = TRUE)
-    clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
-      {paste0("rgb(255,", ., ",", ., ")")}
-    
-    datatable(df,options = list(scrollX = T)) %>% 
-      formatStyle(names(df)[sapply(df,is.numeric)],
-                  backgroundColor = styleInterval(brks, clrs))
+    datatable(df,options = list(scrollX = T,lengthMenu = c(5,10,25)))
   })
   ############################################################################
   ## Barplot of Adjusted/Unadjusted Values
