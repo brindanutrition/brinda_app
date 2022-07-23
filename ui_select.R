@@ -2,7 +2,7 @@
 fluidPage(
   fluidRow(
     box(
-      title = div(icon("list"),"Select Markers"),
+      title = div(icon("list"),"Select Biomarkers"),
       width = 10,
       status = "primary",
       solidHeader = TRUE,

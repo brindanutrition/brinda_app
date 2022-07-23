@@ -9,6 +9,9 @@ fluidPage(
         width = 10,
         tabPanel(
           title = div(icon("calculator"),"BRINDA"),
+          selectInput("outputType",
+                      "Output Type",
+                      choices = c("","simple","full")),
           actionButton("applyBrinda",
                        "Apply BRINDA Adjustment",
                        icon = icon("check"),

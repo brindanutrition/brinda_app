@@ -9,7 +9,7 @@ library(dplyr)
 library(ggridges)
 library(BRINDA)
 library(fresh)
-#sapply(paste("./R/",list.files(path = "./R/"),sep=""),source,.GlobalEnv)
+#sapply(paste("./R/",list.files(path = "./R/"),sep=""),function(x){source(x,local = T)})
 #############################################################################
 ## Shiny theme
 mytheme <- create_theme(
@@ -28,6 +28,21 @@ mytheme <- create_theme(
     box_bg = "white", 
     info_box_bg = "black"
     )
+)
+#############################################################################
+## colors
+cols <- c(
+  "#a6cee3",
+  "#1f78b4",
+  "#b2df8a",
+  "#33a02c",
+  "#fb9a99",
+  "#e31a1c",
+  "#fdbf6f",
+  "#ff7f00",
+  "#cab2d6",
+  "#6a3d9a",
+  "#b15928"
 )
 
 #############################################################################
@@ -74,7 +89,7 @@ body <- dashboardPage(
         )$value
       ),
 #############################################################################
-## Select Markers
+## Select Biomarkers
       tabItem(
         tabName = "select",
         source(
@@ -156,7 +171,7 @@ observe({
                  badgeLabel = "Step 1",
                  badgeColor = "yellow",
                  selected = T),
-        menuItem("Step 2: Select Markers",
+        menuItem("Step 2: Select Biomarkers",
                  tabName = "blank2",
                  icon = icon("list"),
                  badgeLabel = "Step 2",
@@ -189,7 +204,7 @@ observe({
                  badgeLabel = "Step 1",
                  badgeColor = "yellow",
                  selected = T),
-        menuItem("Step 2: Select Markers",
+        menuItem("Step 2: Select Biomarkers",
                  tabName = "select",
                  icon = icon("list"),
                  badgeLabel = "Step 2",
@@ -221,7 +236,7 @@ observe({
                  icon = icon("cloud-upload"),
                  badgeLabel = "Step 1",
                  badgeColor = "yellow"),
-        menuItem("Step 2: Select Markers",
+        menuItem("Step 2: Select Biomarkers",
                  tabName = "select",
                  icon = icon("list"),
                  badgeLabel = "Step 2",
@@ -254,7 +269,7 @@ observe({
                  icon = icon("cloud-upload"),
                  badgeLabel = "Step 1",
                  badgeColor = "yellow"),
-        menuItem("Step 2: Select Markers",
+        menuItem("Step 2: Select Biomarkers",
                  tabName = "select",
                  icon = icon("list"),
                  badgeLabel = "Step 2",
@@ -287,7 +302,7 @@ observe({
                  icon = icon("cloud-upload"),
                  badgeLabel = "Step 1",
                  badgeColor = "yellow"),
-        menuItem("Step 2: Select Markers",
+        menuItem("Step 2: Select Biomarkers",
                  tabName = "select",
                  icon = icon("list"),
                  badgeLabel = "Step 2",
@@ -403,63 +418,66 @@ observe({
 ## columns in their data are the marker columns
   output$rbpPlot <- renderPlot({
     req(input$rbp)
-    library(ggplot2)
-    library(RColorBrewer)
-    cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rbp)]])) +
       geom_density(fill=cols[1],color="darkslategrey")+
       theme_minimal()+
       ggtitle("Retinol Binding Protein")+
       ylab("")+
-      xlab("")
+      xlab(as.character(input$rbpU))
   })
   output$rtPlot <- renderPlot({
     req(input$rt)
-    library(ggplot2)
-    library(RColorBrewer)
-    cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rt)]])) +
       geom_density(fill=cols[2],color="darkslategrey")+
       theme_minimal()+
       ggtitle("Retinol")+
       ylab("")+
-      xlab("")
+      xlab(as.character(input$rtU))
   })
   output$ftPlot <- renderPlot({
     req(input$ft)
-    library(ggplot2)
-    library(RColorBrewer)
-    cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$ft)]])) +
       geom_density(fill=cols[3],color="darkslategrey")+
       theme_minimal()+
       ggtitle("Ferritin")+
       ylab("")+
-      xlab("")
+      xlab(as.character(input$ftU))
   })
   output$stfrPlot <- renderPlot({
     req(input$stfr)
-    library(ggplot2)
-    library(RColorBrewer)
-    cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$stfr)]])) +
-      geom_density(fill=cols[5],color="darkslategrey")+
+      geom_density(fill=cols[4],color="darkslategrey")+
       theme_minimal()+
       ggtitle("Soluble Transferrin Receptor")+
       ylab("")+
-      xlab("")
+      xlab(as.character(input$stfrU))
   })
   output$znPlot <- renderPlot({
     req(input$zn)
-    library(ggplot2)
-    library(RColorBrewer)
-    cols <- brewer.pal(10,"Set3")
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$zn)]])) +
       geom_density(fill=cols[5],color="darkslategrey")+
       theme_minimal()+
       ggtitle("Zinc")+
       ylab("")+
-      xlab("")
+      xlab(as.character(input$znU))
+  })
+  output$agpPlot <- renderPlot({
+    req(input$agp)
+    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$agp)]])) +
+      geom_density(fill=cols[6],color="darkslategrey")+
+      theme_minimal()+
+      ggtitle("AGP")+
+      ylab("")+
+      xlab(as.character(input$agpU))
+  })
+  output$crpPlot <- renderPlot({
+    req(input$crp)
+    ggplot(imported$data(), aes(x=imported$data()[[as.character(input$crp)]])) +
+      geom_density(fill=cols[7],color="darkslategrey")+
+      theme_minimal()+
+      ggtitle("CRP")+
+      ylab("")+
+      xlab(as.character(input$crpU))
   })
 
 #############################################################################
@@ -550,8 +568,10 @@ observe({
 ##############################################################################
 ## Plot cutoff density plots
   # output$cutoffBar <- renderPlot({
+  #   req(input$setCutoff)
+  #   df <- imported$data()
   #   print(cutoffBarPlot(
-  #     df = imported$data(),
+  #     df = df,
   #     rbp = input$rbp,
   #     rt = input$rt,
   #     ft = input$ft,
@@ -609,7 +629,8 @@ observe({
     req(input$setCutoff)
     print(cutoffBarPlot())
   })
-################################################################################ Apply BRINDA adjustment
+##############################################################################
+## Apply BRINDA adjustment
   ## make brinda variable available outside observe statement
   # brinda <- NULL
   # makeReactiveBinding("brinda")
@@ -620,41 +641,38 @@ observe({
       brinda <<- reactive({
         req(input$applyBrinda)
         req(input$pop)
-        rbp <- input$rbp
-        sr <- input$sr
-        sf <- input$sf
-        stfr <- input$stfr
-        zinc <- input$zinc
-        crp <- input$crp
-        agp <- input$agp
-        brinda <- BRINDA(
-          dataset = imported$data(),
-          retinol_binding_protein_varname = rbp,
-          retinol_varname = sr,
-          ferritin_varname = sf,
-          soluble_transferrin_receptor_varname = stfr,
-          zinc_varname = zinc,
-          crp_varname = crp,
-          agp_varname = agp,
-          population_group = "WRA",
-          output_format = full)
-        cutoffs <- c(as.numeric(input$rbpC),
-                     as.numeric(input$srC),
-                     as.numeric(input$sfC),
-                     as.numeric(input$stfrC),
-                     as.numeric(input$zincC))
-        inputs <- c(as.character(input$rbp),
-                    as.character(input$sr),
-                    as.character(input$sf),
-                    as.character(input$stfr),
-                    as.character(input$zinc))
-        adjusted <- c("rbp_adj",
-                      "sr_adj",
-                      "sf_adj",
-                      "stfr_adj",
-                      "zn_adj")
-        for(i in 1:length(inputs)){
-          brinda[adjusted[i]] = ifelse(brinda[[inputs[i]]] < cutoffs[i],brinda[[inputs[i]]],brinda[[adjusted[i]]] )
+        df = imported$data() %>%
+          rename(rbp=as.character(input$rbp)) %>%
+          rename(rt=as.character(input$rt)) %>%
+          rename(ft=as.character(input$ft)) %>%
+          rename(stfr=as.character(input$stfr)) %>%
+          rename(zn=as.character(input$zn)) %>%
+          rename(agp=as.character(input$agp)) %>%
+          rename(crp=as.character(input$crp)) 
+        if(as.character(input$outputType == "simple")){
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "WRA",
+            output_format = simple)
+        }else{
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "WRA",
+            output_format = full)
         }
         brinda
       })
@@ -662,41 +680,38 @@ observe({
       brinda <<- reactive({
         req(input$applyBrinda)
         req(input$pop)
-        rbp <- input$rbp
-        sr <- input$sr
-        sf <- input$sf
-        stfr <- input$stfr
-        zinc <- input$zinc
-        crp <- input$crp
-        agp <- input$agp
-        brinda <- BRINDA(
-          dataset = imported$data(),
-          retinol_binding_protein_varname = rbp,
-          retinol_varname = sr,
-          ferritin_varname = sf,
-          soluble_transferrin_receptor_varname = stfr,
-          zinc_varname = zinc,
-          crp_varname = crp,
-          agp_varname = agp,
-          population_group = "PSC",
-          output_format = full)
-        cutoffs <- c(as.numeric(input$rbpC),
-                     as.numeric(input$srC),
-                     as.numeric(input$sfC),
-                     as.numeric(input$stfrC),
-                     as.numeric(input$zincC))
-        inputs <- c(as.character(input$rbp),
-                    as.character(input$sr),
-                    as.character(input$sf),
-                    as.character(input$stfr),
-                    as.character(input$zinc))
-        adjusted <- c("rbp_adj",
-                      "sr_adj",
-                      "sf_adj",
-                      "stfr_adj",
-                      "zn_adj")
-        for(i in 1:length(inputs)){
-          brinda[adjusted[i]] = ifelse(brinda[[inputs[i]]] < cutoffs[i],brinda[[inputs[i]]],brinda[[adjusted[i]]] )
+        df = imported$data() %>%
+          rename(rbp=as.character(input$rbp)) %>%
+          rename(rt=as.character(input$rt)) %>%
+          rename(ft=as.character(input$ft)) %>%
+          rename(stfr=as.character(input$stfr)) %>%
+          rename(zn=as.character(input$zn)) %>%
+          rename(agp=as.character(input$agp)) %>%
+          rename(crp=as.character(input$crp)) 
+        if(as.character(input$outputType == "simple")){
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "PSC",
+            output_format = simple)
+        }else{
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "PSC",
+            output_format = full)
         }
         brinda
       })
@@ -704,45 +719,38 @@ observe({
       brinda <<- reactive({
         req(input$applyBrinda)
         req(input$pop)
-        rbp <- input$rbp
-        sr <- input$sr
-        sf <- input$sf
-        stfr <- input$stfr
-        zinc <- input$zinc
-        crp <- input$crp
-        agp <- input$agp
-        manAgp <- input$manAgp
-        manCrp <- input$manCrp
-        brinda <- BRINDA(
-          dataset = imported$data(),
-          retinol_binding_protein_varname = rbp,
-          retinol_varname = sr,
-          ferritin_varname = sf,
-          soluble_transferrin_receptor_varname = stfr,
-          zinc_varname = zinc,
-          crp_varname = crp,
-          agp_varname = agp,
-          population_group = "MANUAL" ,
-          agp_ref_value_manual = manAgp,
-          crp_ref_value_manual = manCrp,
-          output_format = full)
-        cutoffs <- c(as.numeric(input$rbpC),
-                     as.numeric(input$srC),
-                     as.numeric(input$sfC),
-                     as.numeric(input$stfrC),
-                     as.numeric(input$zincC))
-        inputs <- c(as.character(input$rbp),
-                    as.character(input$sr),
-                    as.character(input$sf),
-                    as.character(input$stfr),
-                    as.character(input$zinc))
-        adjusted <- c("rbp_adj",
-                      "sr_adj",
-                      "sf_adj",
-                      "stfr_adj",
-                      "zn_adj")
-        for(i in 1:length(inputs)){
-          brinda[adjusted[i]] = ifelse(brinda[[inputs[i]]] < cutoffs[i],brinda[[inputs[i]]],brinda[[adjusted[i]]] )
+        df = imported$data() %>%
+          rename(rbp=as.character(input$rbp)) %>%
+          rename(rt=as.character(input$rt)) %>%
+          rename(ft=as.character(input$ft)) %>%
+          rename(stfr=as.character(input$stfr)) %>%
+          rename(zn=as.character(input$zn)) %>%
+          rename(agp=as.character(input$agp)) %>%
+          rename(crp=as.character(input$crp)) 
+        if(as.character(input$outputType == "simple")){
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "MANUAL",
+            output_format = simple)
+        }else{
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "MANUAL",
+            output_format = full)
         }
         brinda
       })
@@ -750,41 +758,38 @@ observe({
       brinda <<- reactive({
         req(input$applyBrinda)
         req(input$pop)
-        rbp <- input$rbp
-        sr <- input$sr
-        sf <- input$sf
-        stfr <- input$stfr
-        zinc <- input$zinc
-        crp <- input$crp
-        agp <- input$agp
-        brinda <- BRINDA(
-          dataset = imported$data(),
-          retinol_binding_protein_varname = rbp,
-          retinol_varname = sr,
-          ferritin_varname = sf,
-          soluble_transferrin_receptor_varname = stfr,
-          zinc_varname = zinc,
-          crp_varname = crp,
-          agp_varname = agp,
-          population_group = "OTHER",
-          output_format = full)
-        cutoffs <- c(as.numeric(input$rbpC),
-                     as.numeric(input$srC),
-                     as.numeric(input$sfC),
-                     as.numeric(input$stfrC),
-                     as.numeric(input$zincC))
-        inputs <- c(as.character(input$rbp),
-                    as.character(input$sr),
-                    as.character(input$sf),
-                    as.character(input$stfr),
-                    as.character(input$zinc))
-        adjusted <- c("rbp_adj",
-                      "sr_adj",
-                      "sf_adj",
-                      "stfr_adj",
-                      "zn_adj")
-        for(i in 1:length(inputs)){
-          brinda[adjusted[i]] = ifelse(brinda[[inputs[i]]] < cutoffs[i],brinda[[inputs[i]]],brinda[[adjusted[i]]] )
+        df = imported$data() %>%
+          rename(rbp=as.character(input$rbp)) %>%
+          rename(rt=as.character(input$rt)) %>%
+          rename(ft=as.character(input$ft)) %>%
+          rename(stfr=as.character(input$stfr)) %>%
+          rename(zn=as.character(input$zn)) %>%
+          rename(agp=as.character(input$agp)) %>%
+          rename(crp=as.character(input$crp)) 
+        if(as.character(input$outputType == "simple")){
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "OTHER",
+            output_format = simple)
+        }else{
+          brinda <- BRINDA(
+            dataset = df,
+            retinol_binding_protein_varname = rbp,
+            retinol_varname = rt,
+            ferritin_varname = ft,
+            soluble_transferrin_receptor_varname = stfr,
+            zinc_varname = zn,
+            crp_varname = crp,
+            agp_varname = agp,
+            population_group = "OTHER",
+            output_format = full)
         }
         brinda
       })
