@@ -376,39 +376,39 @@ observe({
 ## select the same column twice
   observe({
     updateSelectInput(session, "rbp",
-                      label = "Retinol Binding Protein",
+                      label = "Retinol Binding Protein *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$rbp)
     updateSelectInput(session, "rt",
-                      label = "Retinol",
+                      label = "Retinol *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rbp,input$ft,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$rt)
     updateSelectInput(session, "ft",
-                      label = "Ferritin",
+                      label = "Ferritin *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$rbp,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$ft)
     updateSelectInput(session, "stfr",
-                      label = "Soluble Transferrin Receptor",
+                      label = "Soluble Transferrin Receptor *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$rbp,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$stfr)
     updateSelectInput(session, "zn",
-                      label = "Serum Zinc",
+                      label = "Zinc *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$rbp,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$zn)
     updateSelectInput(session, "agp",
-                      label = "AGP",
+                      label = "AGP *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$rbp,input$crp,input$fasting,input$time))]),
                       selected = input$agp)
     updateSelectInput(session, "crp",
-                      label = "CRP",
+                      label = "CRP *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting,input$time))]),
                       selected = input$crp)
     updateSelectInput(session, "fasting",
-                      label = "Fasting Status",
+                      label = "Fasting Status *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$time))]),
                       selected = input$fasting)
     updateSelectInput(session, "time",
-                      label = "Time of Day",
+                      label = "Time of Day *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting))]),
                       selected = input$time)
   })
@@ -421,7 +421,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rbp)]])) +
       geom_density(fill=cols[1],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("Retinol Binding Protein")+
+      ggtitle(
+        paste("Retinol Binding Protein (",as.character(input$rbpU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$rbpU))
   })
@@ -430,7 +432,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rt)]])) +
       geom_density(fill=cols[2],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("Retinol")+
+      ggtitle(
+        paste("Retinol (",as.character(input$rtU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$rtU))
   })
@@ -439,7 +443,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$ft)]])) +
       geom_density(fill=cols[3],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("Ferritin")+
+      ggtitle(
+        paste("Ferritin (",as.character(input$ftU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$ftU))
   })
@@ -448,7 +454,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$stfr)]])) +
       geom_density(fill=cols[4],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("Soluble Transferrin Receptor")+
+      ggtitle(
+        paste("Soluble Transferrin Receptor (",as.character(input$stfrU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$stfrU))
   })
@@ -457,7 +465,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$zn)]])) +
       geom_density(fill=cols[5],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("Zinc")+
+      ggtitle(
+        paste("Zinc (",as.character(input$znU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$znU))
   })
@@ -466,7 +476,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$agp)]])) +
       geom_density(fill=cols[6],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("AGP")+
+      ggtitle(
+        paste("AGP (",as.character(input$agpU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$agpU))
   })
@@ -475,7 +487,9 @@ observe({
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$crp)]])) +
       geom_density(fill=cols[7],color="darkslategrey")+
       theme_minimal()+
-      ggtitle("CRP")+
+      ggtitle(
+        paste("CRP (",as.character(input$crpU),")",sep="")
+        )+
       ylab("")+
       xlab(as.character(input$crpU))
   })
@@ -609,9 +623,9 @@ observe({
       select(c(as.character(input$zn),as.character(input$fasting),as.character(input$time)))%>%
       mutate(biomarker=rep(as.character(input$zn),nrow(.)))%>%
       mutate(deficient=ifelse(
-        (imported$data()[[as.character(input$fasting)]]=="fasting" & imported$data()[[as.character(input$time)]]=="morning" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_fast_C)) |
-          (imported$data()[[as.character(input$fasting)]]=="fasting" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_nonfast_C)) |
-          (imported$data()[[as.character(input$fasting)]]=="non-fasting" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_after_nonfast_C))
+        (imported$data()[[as.character(input$fasting)]]=="fasted" & imported$data()[[as.character(input$time)]]=="morning" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_fast_C)) |
+          (imported$data()[[as.character(input$fasting)]]=="fasted" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_nonfast_C)) |
+          (imported$data()[[as.character(input$fasting)]]=="non-fasted" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_after_nonfast_C))
         ,"deficient","normal"))
     defDf <- rbind.data.frame(
       rbp %>% select(biomarker,deficient),
@@ -622,8 +636,11 @@ observe({
     ) %>%
       mutate(value=rep(1,nrow(.)))
     ggplot(defDf, aes(x = biomarker, y= value, fill = deficient)) +
-      geom_bar(stat="identity", position = "stack", width = 0.5) +
-      theme_bw()
+      geom_bar(stat="identity", position = "fill", width = 0.5) +
+      theme_bw()+
+      scale_y_continuous(labels = scales::percent)+
+      xlab("Biomarker")+
+      ylab("Prevalence of Deficiency (%)")
   }
   output$cutoffBar <- renderPlot({
     req(input$setCutoff)
@@ -631,7 +648,7 @@ observe({
   })
 ##############################################################################
 ## Apply BRINDA adjustment
-  ## make brinda variable available outside observe statement
+## make brinda variable available outside observe statement
   # brinda <- NULL
   # makeReactiveBinding("brinda")
   # 
@@ -643,8 +660,8 @@ observe({
         req(input$pop)
         df = imported$data() %>%
           rename(rbp=as.character(input$rbp)) %>%
-          rename(rt=as.character(input$rt)) %>%
-          rename(ft=as.character(input$ft)) %>%
+          rename(sr=as.character(input$rt)) %>%
+          rename(sf=as.character(input$ft)) %>%
           rename(stfr=as.character(input$stfr)) %>%
           rename(zn=as.character(input$zn)) %>%
           rename(agp=as.character(input$agp)) %>%
@@ -653,8 +670,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -665,8 +682,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -682,8 +699,8 @@ observe({
         req(input$pop)
         df = imported$data() %>%
           rename(rbp=as.character(input$rbp)) %>%
-          rename(rt=as.character(input$rt)) %>%
-          rename(ft=as.character(input$ft)) %>%
+          rename(sr=as.character(input$rt)) %>%
+          rename(sf=as.character(input$ft)) %>%
           rename(stfr=as.character(input$stfr)) %>%
           rename(zn=as.character(input$zn)) %>%
           rename(agp=as.character(input$agp)) %>%
@@ -692,8 +709,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -704,8 +721,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -721,8 +738,8 @@ observe({
         req(input$pop)
         df = imported$data() %>%
           rename(rbp=as.character(input$rbp)) %>%
-          rename(rt=as.character(input$rt)) %>%
-          rename(ft=as.character(input$ft)) %>%
+          rename(sr=as.character(input$rt)) %>%
+          rename(sf=as.character(input$ft)) %>%
           rename(stfr=as.character(input$stfr)) %>%
           rename(zn=as.character(input$zn)) %>%
           rename(agp=as.character(input$agp)) %>%
@@ -731,8 +748,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -743,8 +760,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -760,8 +777,8 @@ observe({
         req(input$pop)
         df = imported$data() %>%
           rename(rbp=as.character(input$rbp)) %>%
-          rename(rt=as.character(input$rt)) %>%
-          rename(ft=as.character(input$ft)) %>%
+          rename(sr=as.character(input$rt)) %>%
+          rename(sf=as.character(input$ft)) %>%
           rename(stfr=as.character(input$stfr)) %>%
           rename(zn=as.character(input$zn)) %>%
           rename(agp=as.character(input$agp)) %>%
@@ -770,8 +787,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -782,8 +799,8 @@ observe({
           brinda <- BRINDA(
             dataset = df,
             retinol_binding_protein_varname = rbp,
-            retinol_varname = rt,
-            ferritin_varname = ft,
+            retinol_varname = sr,
+            ferritin_varname = sf,
             soluble_transferrin_receptor_varname = stfr,
             zinc_varname = zn,
             crp_varname = crp,
@@ -805,73 +822,112 @@ observe({
   })
   ############################################################################
   ## Barplot of Adjusted/Unadjusted Values
-  bar <- function(){
+  adjBarPlot <- function(){
     df <- brinda()
     tmp=reshape2::melt(
       df[c(
-        as.character(input$rbp),
+        "rbp",
         "rbp_adj", 
-        as.character(input$rt),
+        "sr",
         "sr_adj", 
-        as.character(input$ft),
+        "sf",
         "sf_adj", 
-        as.character(input$stfr),
+        "stfr",
         "stfr_adj", 
-        as.character(input$zn),
+        "zn",
         "zn_adj")])
-    tmp$variable <- gsub("zinc","zn",tmp$variable)
     plottingDF <- tmp %>%
       group_by(variable) %>%
       summarize(
-        sum = sum(value,na.rm = T),
-        se = sd(value,na.rm = T)/sqrt(n())
+        geom_mean = exp(mean(log(value),na.rm=T))
       ) %>%
       mutate(gen=gsub("_.*","",variable)) %>%
-      mutate(Adjusted = grepl("adj",variable))
+      mutate(Adjusted = ifelse(grepl("adj",variable),"adjusted","non-adjusted") )
     
-    cols <- brewer.pal(10,"Set3")
-    ggplot(plottingDF, aes(x = gen, y= sum, fill = Adjusted)) +
-      geom_bar(stat="identity", width=.5, position = "dodge") +
-      theme_minimal()+
-      scale_fill_manual(values = cols[3:4])+
-      geom_errorbar(aes(ymin=sum-se, 
-                        ymax=sum+se),
-                    width=.2, # Width of the error bars
-                    position=position_dodge(.5), 
-                    color="firebrick") +
-      xlab("Micronutrient") +
-      ylab("Sum Per Micronutrient")+
-      scale_y_log10()
+    ggplot(plottingDF, aes(x = gen, y= geom_mean, fill = Adjusted)) +
+      geom_bar(stat="identity", width=.5, position = "dodge",alpha=0.8) +
+      theme_bw()+
+      scale_fill_manual(values = cols[c(2,6)])+
+      scale_y_log10()+
+      xlab("Biomarker") +
+      ylab("Geometric Mean")
   }
 
-  output$barplot <- renderPlot({
-    print(bar())
+  output$adjBarPlot <- renderPlot({
+    print(adjBarPlot())
   })
+  
+  defBarPlot <- function(){
+    rbp <-  brinda() %>%
+      select(c("rbp_adj",as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep("rbp_adj",nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(brinda()[["rbp_adj"]])<as.numeric(input$rbpC),"deficient","normal"))
+    sr <- brinda() %>%
+      select(c("sr_adj",as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep("sr_adj",nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(brinda()[["sr_adj"]])<as.numeric(input$rtC),"deficient","normal"))
+    sf <- brinda() %>%
+      select(c("sf_adj",as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep("sf_adj",nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(brinda()[["sf_adj"]])<as.numeric(input$ftC),"deficient","normal"))
+    stfr <- brinda() %>%
+      select(c("stfr_adj",as.character(input$fasting),as.character(input$time))) %>%
+      mutate(biomarker=rep("stfr_adj",nrow(.)))%>%
+      mutate(deficient=ifelse(as.numeric(brinda()[["stfr_adj"]])<as.numeric(input$stfrC),"deficient","normal"))
+    zn <- brinda() %>%
+      select(c("zn_adj",as.character(input$fasting),as.character(input$time)))%>%
+      mutate(biomarker=rep("zn_adj",nrow(.)))%>%
+      mutate(deficient=ifelse(
+        (brinda()[[as.character(input$fasting)]]=="fasted" & brinda()[[as.character(input$time)]]=="morning" & as.numeric(brinda()[["zn_adj"]])<as.numeric(input$zn_morn_fast_C)) |
+          (brinda()[[as.character(input$fasting)]]=="fasted" & brinda()[[as.character(input$time)]]=="afternoon" & as.numeric(brinda()[["zn_adj"]])<as.numeric(input$zn_morn_nonfast_C)) |
+          (brinda()[[as.character(input$fasting)]]=="non-fasted" & brinda()[[as.character(input$time)]]=="afternoon" & as.numeric(brinda()[["zn_adj"]])<as.numeric(input$zn_after_nonfast_C))
+        ,"deficient","normal"))
+    
+    defDf <- rbind.data.frame(
+      rbp %>% select(biomarker,deficient),
+      sr %>% select(biomarker,deficient),
+      sf %>% select(biomarker,deficient),
+      stfr %>% select(biomarker,deficient),
+      zn %>% select(biomarker,deficient)
+    ) %>%
+      mutate(value=rep(1,nrow(.)))
+    ggplot(defDf, aes(x = biomarker, y= value, fill = deficient)) +
+      geom_bar(stat="identity", position = "fill", width = 0.5,alpha=0.8) +
+      theme_bw()+
+      scale_y_continuous(labels = scales::percent)+
+      xlab("Biomarker")+
+      ylab("Prevalence of Deficiency (%)")
+  }
+  
+  output$defBarPlot <- renderPlot({
+    print(defBarPlot())
+  })
+  
   density <- function(){
-    cols <- brewer.pal(10,"Set3")
     df <- brinda()
     tmp=reshape2::melt(
       df[c(
-        as.character(input$rbp),
+        "rbp",
         "rbp_adj", 
-        as.character(input$rt),
+        "sr",
         "sr_adj", 
-        as.character(input$ft),
+        "sf",
         "sf_adj", 
-        as.character(input$stfr),
+        "stfr",
         "stfr_adj", 
-        as.character(input$zn),
+        "zn",
         "zn_adj")])
-    tmp$variable <- gsub("zinc","zn",tmp$variable)
-    tmp$Adjusted = grepl("adj",tmp$variable)
-    ggplot(tmp, aes(y=variable,x=value,fill=Adjusted)) +
-      geom_density_ridges(color="darkslategrey")+
-      scale_fill_manual(values = cols[3:4],
-                        labels=c("Unadjusted","Adjusted"))+
-      theme_minimal()+
+    plottingDF <- tmp %>%
+      mutate(gen=gsub("_.*","",variable)) %>%
+      mutate(Adjusted = ifelse(grepl("adj",variable),"adjusted","non-adjusted") )
+    
+    ggplot(plottingDF, aes(y=gen,x=value,fill=Adjusted)) +
+      geom_density_ridges(color="darkslategrey",alpha=0.8)+
+      scale_fill_manual(values = cols[c(2,6)])+
+      theme_bw()+
       scale_x_log10()+
-      xlab("Micronutrient Value")+
-      ylab("Micronutrient")
+      xlab("Biomarker Value")+
+      ylab("Biomarker")
   }
   output$densityplot <- renderPlot({
     print(density())
@@ -887,13 +943,22 @@ observe({
     })
 #############################################################################
 ## Download BRINDA adjusted barplot
-  output$downloadBar <- downloadHandler(
-    filename = "BRINDA_barplot.png",
+  output$downloadAdjBar <- downloadHandler(
+    filename = "BRINDA_adjustment_barplot.png",
     content = function(file) {
       png(file)
-      print(bar())
+      print(adjBarPlot())
       dev.off()
     })  
+#############################################################################
+## Download BRINDA adjusted barplot
+  output$downloadDefBar <- downloadHandler(
+    filename = "BRINDA_deficiency_barplot.png",
+    content = function(file) {
+      png(file)
+      print(defBarPlot())
+      dev.off()
+    }) 
 #############################################################################
 ## Download BRINDA adjusted density plot
   output$downloadDensity <- downloadHandler(

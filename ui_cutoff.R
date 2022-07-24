@@ -78,7 +78,7 @@ fluidPage(
           )
         ),
         tabPanel(
-          title =div(icon("chart-bar"),"Bar Plot"),
+          title =div(icon("chart-bar"),"Non-Adjusted Deficiency Bar Plot"),
           plotOutput("cutoffBar")
         )
       )

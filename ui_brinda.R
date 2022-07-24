@@ -9,20 +9,31 @@ fluidPage(
         width = 10,
         tabPanel(
           title = div(icon("calculator"),"BRINDA"),
-          selectInput("outputType",
-                      "Output Type",
-                      choices = c("","simple","full")),
-          actionButton("applyBrinda",
-                       "Apply BRINDA Adjustment",
-                       icon = icon("check"),
-                       style="background-color: #301014;color:white;"),
+          div(
+            selectInput("outputType",
+                        "Output Type",
+                        choices = c("","simple","full")),
+            style="display:inline-block;vertical-align:top;width:200px;"
+          ),
+          div(
+            actionButton("applyBrinda",
+                         "Apply BRINDA Adjustment",
+                         icon = icon("check"),
+                         style="background-color: #301014;color:white;"),
+            style="display:inline-block;vertical-align:top;padding-top:25px;width:200px"
+          ),
           dataTableOutput("brindaTbl"),
           downloadButton("downloadRes","Download",
                          style="background-color: #301014;color:white;align:right")),
         tabPanel(
-          title = div(icon("chart-bar"),"Bar Plot"),
-          plotOutput("barplot"),
-          downloadButton("downloadBar","Download",
+          title = div(icon("chart-bar"),"Adjustment Bar Plot"),
+          plotOutput("adjBarPlot"),
+          downloadButton("downloadAdjBar","Download",
+                         style="background-color: #301014;color:white;align:right")),
+        tabPanel(
+          title = div(icon("chart-bar"),"Deficiency Bar Plot"),
+          plotOutput("defBarPlot"),
+          downloadButton("downloadDefBar","Download",
                          style="background-color: #301014;color:white;align:right")),
         tabPanel(
           title = div(icon("chart-area"),"Density Plot"),
