@@ -7,7 +7,7 @@ fluidPage(
       status = "primary",
       solidHeader = TRUE,
       div(
-        selectInput("rbp","Retinol Binding Protein",choices = NULL),
+        selectInput("rbp","Retinol Binding Protein *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         selectInput("rbpU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
@@ -17,7 +17,7 @@ fluidPage(
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("rt","Retinol",choices = NULL),
+        selectInput("rt","Retinol *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         selectInput("rtU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
@@ -27,7 +27,7 @@ fluidPage(
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("ft","Ferritin",choices = NULL),
+        selectInput("ft","Ferritin *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         selectInput("ftU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
@@ -37,7 +37,7 @@ fluidPage(
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("stfr","Soluble Transferrin Receptor",choices = NULL),
+        selectInput("stfr","Soluble Transferrin Receptor *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         selectInput("stfrU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
@@ -47,7 +47,7 @@ fluidPage(
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("zn","Zinc",choices = NULL),
+        selectInput("zn","Zinc *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         selectInput("znU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
@@ -57,41 +57,43 @@ fluidPage(
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("agp","AGP",choices = NULL),
+        selectInput("agp","AGP *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("agpU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("agpU","Unit *",choices=c("","umol/L","ug/L","mg/L","g/L")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("agpPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("crp","CRP",choices = NULL),
+        selectInput("crp","CRP *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("crpU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("crpU","Unit *",choices=c("","umol/L","ug/L","mg/L","g/L")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("crpPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("fasting","Fasting Status",choices = NULL),
+        selectInput("fasting","Fasting Status *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("time","Time of Day ",choices = NULL),
+        selectInput("time","Time of Day *",choices = NULL),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("pop","Population",choices = c("","WRA", "PSC", "Other","Manual")),
+        selectInput("pop","Population *",choices = c("","WRA", "PSC", "Other","Manual")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       br(),
       uiOutput("manAgp"),
       uiOutput("manCrp"),
       actionButton("setMarkers",
-                   "Set Markers",
+                   "Set Biomarkers",
                    icon = icon("check"),
-                   style="background-color: #301014;color:white;")
+                   style="background-color: #301014;color:white;"),
+      br(),
+      strong("* required")
     )
   ),
   fluidRow(
