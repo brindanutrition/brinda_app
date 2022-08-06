@@ -69,12 +69,12 @@ fluidPage(
                          style="background-color: #301014;color:white;")
           ),
           column(
-            width = 6,
+            width = 1
+          ),
+          column(
+            width = 5,
             br(),
-            h4("Suggested Biomarker Cutoffs"),
-            tableOutput("defTbl"),
-            h4("Suggested Zinc Cutoffs"),
-            tableOutput("znDefTbl")
+            uiOutput("defImage")
           )
         ),
         tabPanel(
