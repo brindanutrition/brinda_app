@@ -93,6 +93,7 @@ fluidPage(
                    icon = icon("check"),
                    style="background-color: #301014;color:white;"),
       br(),
+      br(),
       strong("* required")
     )
   ),
