@@ -19,5 +19,5 @@ or go to `Code` > `Download Zip`
 ## Video Walkthrough
 
 <video width="320" height="240" controls>
-  <source src="data/video.mp4" type="video/mp4">
+  <source src="./data/video.mp4" type="video/mp4">
 </video>
