@@ -2,7 +2,7 @@
 
 This is the working repository for the BRINDA Rshiny app.
 
-## Running the app
+## Intstallation
 
 1. To run this app download the repo with either:
 
@@ -15,3 +15,9 @@ or go to `Code` > `Download Zip`
 2. Go to RStudio and go to `File` > `Open File`. Now select the `app.R` file in the folder you just downloaded
 
 3. Once the `app.R` file is loaded in RStudio click `Run App` to run
+
+## Video Walkthrough
+
+<video width="320" height="240" controls>
+  <source src="data/video.mp4" type="video/mp4">
+</video>
