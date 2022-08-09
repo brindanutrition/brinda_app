@@ -18,54 +18,57 @@ params:
   rtC: NULL
   ftC: NULL
   stfrC: NULL
-  znC: NULL
-  rbpPlotCf: NULL
-  rtPlotCf: NULL
-  ftPlotCf: NULL
-  stfrPlotCf: NULL
-  znPlotCf: NULL
+  zn_morn_fast_C : NULL
+  zn_morn_nonfast_C : NULL
+  zn_after_nonfast_C : NULL
+  initCut: NULL
   refAgp : NULL
   refCrp :  NULL
-  bar : NULL
+  adjBar : NULL
+  defBar : NULL
+  stats : NULL
   density : NULL
 ---
 
 ## Input Data
 
-The input data has `r nrow(params$data)` samples and `r ncol(params$data)` observations per sample. The following micronutrients were assigned to the column names listed below:
+The input data has `r nrow(params$data)` samples and `r ncol(params$data)` observations per sample. The following biomarkers were assigned to the column names listed below and had the following statistics:
 
-| Micronutrient | Assigned Column Name |
-|-|-|
-| Retinol Binding Protein| `r params$rbp` |
-| Retinol | `r params$rt` |
-| Ferritin | `r params$ft` |
-| Soluble Transferrin Receptor | `r params$stfr` |
-| Serum Zinc | `r params$zn` |
-| AGP | `r params$agp` |
-| CRP | `r params$crp` |                                          
+```{r results='asis',echo=FALSE}
+library(kableExtra)
+knitr::kable(params$stats, format = "html") %>%
+  kable_styling()
+```
 
-## Value Cutoffs
 
-The following cutoff was applied to the micronutrients below. Micronutrients with a level below the cutoff were not adjusted using the BRINDA method:
+## Initial Deficiency Cutoff
 
-| Micronutrient | Value Cutoff |
+The following cutoff was applied to the biomarkers below. Biomarkers with a level below the cutoff were considered deficient prior to the BRINDA adjustment:
+
+| Biomarker | Value Cutoff |
 |-|-|
 | Retinol Binding Protein| `r params$rbpC` |
 | Retinol | `r params$rtC` |
 | Ferritin | `r params$ftC` |
 | Soluble Transferrin Receptor | `r params$stfrC` |
-| Serum Zinc | `r params$znC` |
+| Zinc Morning/Fasting Cutoff | `r params$zn_morn_fast_C` |
+| Zinc Morning/Non-Fasting Cutoff | `r params$zn_morn_nonfast_C` |
+| Zinc Afternoon/Non-Fasting Cutoff | `r params$zn_after_nonfast_C` |
+| AGP | 1 |
+| CRP | 5 |
+
 
 
 ```{r cutoff,echo=FALSE,warning=F,message=FALSE}
 library(patchwork)
 library(ggplot2)
-(params$rbpPlotCf / params$rtPlotCf / params$ftPlotCf) | ( params$stfrPlotCf / params$znPlotCf /ggplot() + theme_void())
+
+params$initCut
 ```
 
 ## Population Group
 
-Micronutrient values are adjusted per population group and as such reference AGP and CRP values are set accordingly. The population group, reference AGP, and reference CRP were set to the following:
+Biomarker values are adjusted per population group and as such reference AGP and CRP values are set accordingly. The population group, reference AGP, and reference CRP were set to the following:
 
 ```{r population,echo=FALSE,warning=F,message=FALSE}
 population = params$pop
@@ -90,9 +93,16 @@ if(population == "PSC"){
 
 ## BRINDA Adjustment
 
-The micronutrient values have been adjusted and the difference between adjusted and unadjusted values are displayed below:
+The biomarker values have been adjusted and the difference between adjusted and unadjusted values are displayed below:
 
 ```{r adjustment,echo=FALSE,warning=F,message=FALSE}
 library(patchwork)
-params$bar/params$density
+params$adjBar/params$density
+```
+
+Deficiency has been recalculated below after applying the BRINDA adjustment:
+
+```{r defAdj,echo=FALSE,warning=F,message=FALSE}
+library(patchwork)
+params$defBar
 ```

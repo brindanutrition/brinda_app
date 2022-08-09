@@ -23,22 +23,22 @@ fluidPage(
             style="display:inline-block;vertical-align:top;padding-top:25px;width:200px"
           ),
           dataTableOutput("brindaTbl"),
-          downloadButton("downloadRes","Download",
+          downloadButton("downloadRes","Download BRINDA Adjusted Data",
                          style="background-color: #301014;color:white;align:right")),
         tabPanel(
           title = div(icon("chart-bar"),"Adjustment Bar Plot"),
           plotOutput("adjBarPlot"),
-          downloadButton("downloadAdjBar","Download",
+          downloadButton("downloadAdjBar","Download Adjustment Bar Plot",
                          style="background-color: #301014;color:white;align:right")),
         tabPanel(
           title = div(icon("chart-bar"),"Deficiency Bar Plot"),
           plotOutput("defBarPlot"),
-          downloadButton("downloadDefBar","Download",
+          downloadButton("downloadDefBar","Download Deficiency Bar Plot",
                          style="background-color: #301014;color:white;align:right")),
         tabPanel(
           title = div(icon("chart-area"),"Density Plot"),
           plotOutput("densityplot"),
-          downloadButton("downloadDensity","Download",
+          downloadButton("downloadDensity","Download Density Plot",
                          style="background-color: #301014;color:white;align:right"))
       )
     )
