@@ -12,7 +12,9 @@ fluidPage(
           div(
             selectInput("outputType",
                         "Output Type",
-                        choices = c("","simple","full")),
+                        choices = c("",
+                                    "only output adjusted values",
+                                    "output adjusted and intermediate parameters")),
             style="display:inline-block;vertical-align:top;width:200px;"
           ),
           div(
@@ -22,6 +24,8 @@ fluidPage(
                          style="background-color: #301014;color:white;"),
             style="display:inline-block;vertical-align:top;padding-top:25px;width:200px"
           ),
+          br(),
+          h3("BRINDA Adjustment Table"),
           dataTableOutput("brindaTbl"),
           downloadButton("downloadRes","Download BRINDA Adjusted Data",
                          style="background-color: #301014;color:white;align:right")),
