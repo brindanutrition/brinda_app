@@ -1115,7 +1115,7 @@ server <- function(input, output, session) {
         title="BRINDA Adjustment Density Plot"
       )+
       theme(text = element_text(size=14))+
-      facet_grid(Reference~.,scales = "free_x",space = "free")
+      facet_grid(Reference~.,scales = "free_y",space = "free")
   }
   
   output$densityplot <- renderPlot({
