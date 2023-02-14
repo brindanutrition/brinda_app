@@ -1,18 +1,19 @@
+# --- Load Libraries -----------------------------------------------------------
 library(shiny)
 library(ggplot2)
 library(datamods)
 library(sortable)
 library(shinydashboard)
-library(ggplot2)
 library(shinyalert)
 library(DT)
-library(dplyr)
+library(tidyverse)
+library(patchwork)
 library(ggridges)
 library(BRINDA)
 library(fresh)
+source("./R/unit_converter.R")
 
-#############################################################################
-## Shiny theme
+# --- Shiny theme --------------------------------------------------------------
 mytheme <- create_theme(
   theme = "flatly",
   adminlte_color(
@@ -28,10 +29,10 @@ mytheme <- create_theme(
     content_bg = "#FFF",
     box_bg = "white", 
     info_box_bg = "black"
-    )
+  )
 )
-#############################################################################
-## colors
+
+# --- colors -------------------------------------------------------------------
 cols <- c(
   "#a6cee3",
   "#1f78b4",
@@ -46,29 +47,27 @@ cols <- c(
   "#b15928"
 )
 
-#############################################################################
-## header
+# --- header -------------------------------------------------------------------
 body <- dashboardPage(
   dashboardHeader(
     tags$li(class = "dropdown",
             tags$style(".main-header {max-height: 100px;}"),
             tags$style(".main-header .logo {height: 100px;}")),
     title = div(
-    img(
-      id="back2main",
-      src="logo1.png",
-      style = "height:95px;")
-  )),
-#############################################################################
-## sidebar
+      img(
+        id="back2main",
+        src="logo1.png",
+        style = "height:95px;")
+    )),
+
+  # --- sidebar ----------------------------------------------------------------
   dashboardSidebar(
     tags$style(".left-side, .main-sidebar {padding-top: 100px;}"),
     use_theme(mytheme),
     width = 300,
     sidebarMenuOutput("sidebarmenu")
-    ),
-#############################################################################
-## body
+  ),
+  # --- body -------------------------------------------------------------------
   dashboardBody(
     tags$style("
               body {
@@ -79,8 +78,7 @@ body <- dashboardPage(
               "),
     use_theme(mytheme),
     tabItems(
-#############################################################################
-## Import Data
+      # --- Import Data UI -----------------------------------------------------
       tabItem(
         tabName = "import",
         source(
@@ -89,14 +87,16 @@ body <- dashboardPage(
           encoding = "UTF-8"
         )$value
       ),
-#############################################################################
-## Select Biomarkers
+      # --- Select Biomarkers UI -----------------------------------------------
       tabItem(
         tabName = "select",
-        uiOutput("drag_drop")
+        source(
+          file = "ui_select.R",
+          local = TRUE,
+          encoding = "UTF-8"
+        )$value
       ),
-#############################################################################
-## Select Cutoff
+      # --- Select Cutoff UI ---------------------------------------------------
       tabItem(
         tabName = "cutoff",
         source(
@@ -105,8 +105,7 @@ body <- dashboardPage(
           encoding = "UTF-8"
         )$value
       ),
-#############################################################################
-## Run BRINDA Adjustment
+      # --- Run BRINDA Adjustment UI -------------------------------------------
       tabItem(
         tabName = "brinda",
         source(
@@ -115,8 +114,7 @@ body <- dashboardPage(
           encoding = "UTF-8"
         )$value
       ),
-#############################################################################
-## Generate Report
+      # --- Generate Report UI -------------------------------------------------
       tabItem(
         tabName = "report",
         source(
@@ -124,20 +122,17 @@ body <- dashboardPage(
           local = TRUE,
           encoding = "UTF-8"
         )$value
-        )
-#############################################################################
+      )
     )
   )
 )
 
-#############################################################################
-## Shiny UI
+# --- Shiny UI -----------------------------------------------------------------
 ui <- function(request){(body)}
-#############################################################################
-## Shiny Server
+
+# --- Shiny Server -------------------------------------------------------------
 server <- function(input, output, session) {
-#############################################################################
-## Section to Import Data
+  # --- Section to Import Data -------------------------------------------------
   observeEvent(input$importData, {
     import_modal(
       id = "myid",
@@ -147,185 +142,181 @@ server <- function(input, output, session) {
   })
   
   imported <- import_server("myid", return_class = "tbl_df")
-#############################################################################
-## Render data table with conditional formatting
+  # --- Render data table ------------------------------------------------------
   output$table <- renderDataTable({
     req(imported$data())
     df <- imported$data()
     datatable(df,options = list(scrollX = T,lengthMenu=c(5,10,25)))
   })
-#############################################################################
-## Update Sidebar depending on what 
-## step you are on
-observe({
-  observeEvent(1==1,{
-    output$sidebarmenu <- renderMenu({
-      sidebarMenu(
-        id = "tabs",
-        menuItem("Step 1: Import Data",
-                 tabName = "import",
-                 icon = icon("cloud-upload"),
-                 badgeLabel = "Step 1",
-                 badgeColor = "yellow",
-                 selected = T),
-        menuItem("Step 2: Select Biomarkers",
-                 tabName = "blank2",
-                 icon = icon("list"),
-                 badgeLabel = "Step 2",
-                 badgeColor = "black"),
-        menuItem("Step 3: Optional: Apply Cutoff",
-                 tabName = "blank3",
-                 icon = icon("filter"),
-                 badgeLabel = "Step 3",
-                 badgeColor = "black"),
-        menuItem("Step 4: Run BRINDA Adjustment",
-                 tabName = "blank4",
-                 icon =  icon("calculator"),
-                 badgeLabel = "Step 4",
-                 badgeColor = "black"),
-        menuItem("Step 5: Report",
-                 tabName = "blank5",
-                 icon =  icon("file"),
-                 badgeLabel = "Step 5",
-                 badgeColor = "black")
-      )
+  # --- Update Sidebar depending on what step you are on -----------------------
+  observe({
+    observeEvent(1==1,{
+      output$sidebarmenu <- renderMenu({
+        sidebarMenu(
+          id = "tabs",
+          menuItem("Step 1: Import Data",
+                   tabName = "import",
+                   icon = icon("cloud-upload"),
+                   badgeLabel = "Step 1",
+                   badgeColor = "yellow",
+                   selected = T),
+          menuItem("Step 2: Select Biomarkers",
+                   tabName = "blank2",
+                   icon = icon("list"),
+                   badgeLabel = "Step 2",
+                   badgeColor = "black"),
+          menuItem("Step 3: Optional: Apply Cutoff",
+                   tabName = "blank3",
+                   icon = icon("filter"),
+                   badgeLabel = "Step 3",
+                   badgeColor = "black"),
+          menuItem("Step 4: Run BRINDA Adjustment",
+                   tabName = "blank4",
+                   icon =  icon("calculator"),
+                   badgeLabel = "Step 4",
+                   badgeColor = "black"),
+          menuItem("Step 5: Report",
+                   tabName = "blank5",
+                   icon =  icon("file"),
+                   badgeLabel = "Step 5",
+                   badgeColor = "black")
+        )
+      })
+    })
+    observeEvent(input$importData,{
+      output$sidebarmenu <- renderMenu({
+        sidebarMenu(
+          id = "tabs",
+          menuItem("Step 1: Import Data",
+                   tabName = "import",
+                   icon = icon("cloud-upload"),
+                   badgeLabel = "Step 1",
+                   badgeColor = "yellow",
+                   selected = T),
+          menuItem("Step 2: Select Biomarkers",
+                   tabName = "select",
+                   icon = icon("list"),
+                   badgeLabel = "Step 2",
+                   badgeColor = "orange"),
+          menuItem("Step 3: Optional: Apply Cutoff",
+                   tabName = "blank3",
+                   icon = icon("filter"),
+                   badgeLabel = "Step 3",
+                   badgeColor = "black"),
+          menuItem("Step 4: Run BRINDA Adjustment",
+                   tabName = "blank4",
+                   icon =  icon("calculator"),
+                   badgeLabel = "Step 4",
+                   badgeColor = "black"),
+          menuItem("Step 5: Report",
+                   tabName = "blank5",
+                   icon =  icon("file"),
+                   badgeLabel = "Step 5",
+                   badgeColor = "black")
+        )
+      })
+    })
+    observeEvent(input$setMarkers,{
+      output$sidebarmenu <- renderMenu({
+        sidebarMenu(
+          id = "tabs",
+          menuItem("Step 1: Import Data",
+                   tabName = "import",
+                   icon = icon("cloud-upload"),
+                   badgeLabel = "Step 1",
+                   badgeColor = "yellow"),
+          menuItem("Step 2: Select Biomarkers",
+                   tabName = "select",
+                   icon = icon("list"),
+                   badgeLabel = "Step 2",
+                   badgeColor = "orange",
+                   selected = T),
+          menuItem("Step 3: Optional: Apply Cutoff",
+                   tabName = "cutoff",
+                   icon = icon("filter"),
+                   badgeLabel = "Step 3",
+                   badgeColor = "maroon"),
+          menuItem("Step 4: Run BRINDA Adjustment",
+                   tabName = "blank4",
+                   icon =  icon("calculator"),
+                   badgeLabel = "Step 4",
+                   badgeColor = "black"),
+          menuItem("Step 5: Report",
+                   tabName = "blank5",
+                   icon =  icon("file"),
+                   badgeLabel = "Step 5",
+                   badgeColor = "black")
+        )
+      })
+    })
+    observeEvent(input$setCutoff,{
+      output$sidebarmenu <- renderMenu({
+        sidebarMenu(
+          id = "tabs",
+          menuItem("Step 1: Import Data",
+                   tabName = "import",
+                   icon = icon("cloud-upload"),
+                   badgeLabel = "Step 1",
+                   badgeColor = "yellow"),
+          menuItem("Step 2: Select Biomarkers",
+                   tabName = "select",
+                   icon = icon("list"),
+                   badgeLabel = "Step 2",
+                   badgeColor = "orange"),
+          menuItem("Step 3: Optional: Apply Cutoff",
+                   tabName = "cutoff",
+                   icon = icon("filter"),
+                   badgeLabel = "Step 3",
+                   badgeColor = "maroon",
+                   selected = T),
+          menuItem("Step 4: Run BRINDA Adjustment",
+                   tabName = "brinda",
+                   icon =  icon("calculator"),
+                   badgeLabel = "Step 4",
+                   badgeColor = "maroon"),
+          menuItem("Step 5: Report",
+                   tabName = "blank5",
+                   icon =  icon("file"),
+                   badgeLabel = "Step 5",
+                   badgeColor = "black")
+        )
+      })
+    })
+    observeEvent(input$applyBrinda,{
+      output$sidebarmenu <- renderMenu({
+        sidebarMenu(
+          id = "tabs",
+          menuItem("Step 1: Import Data",
+                   tabName = "import",
+                   icon = icon("cloud-upload"),
+                   badgeLabel = "Step 1",
+                   badgeColor = "yellow"),
+          menuItem("Step 2: Select Biomarkers",
+                   tabName = "select",
+                   icon = icon("list"),
+                   badgeLabel = "Step 2",
+                   badgeColor = "orange"),
+          menuItem("Step 3: Optional: Apply Cutoff",
+                   tabName = "cutoff",
+                   icon = icon("filter"),
+                   badgeLabel = "Step 3",
+                   badgeColor = "maroon"),
+          menuItem("Step 4: Run BRINDA Adjustment",
+                   tabName = "brinda",
+                   icon =  icon("calculator"),
+                   badgeLabel = "Step 4",
+                   badgeColor = "maroon",
+                   selected = T),
+          menuItem("Step 5: Report",
+                   tabName = "report",
+                   icon =  icon("file"),
+                   badgeLabel = "Step 5",
+                   badgeColor = "fuchsia")
+        )
+      })
     })
   })
-  observeEvent(input$importData,{
-    output$sidebarmenu <- renderMenu({
-      sidebarMenu(
-        id = "tabs",
-        menuItem("Step 1: Import Data",
-                 tabName = "import",
-                 icon = icon("cloud-upload"),
-                 badgeLabel = "Step 1",
-                 badgeColor = "yellow",
-                 selected = T),
-        menuItem("Step 2: Select Biomarkers",
-                 tabName = "select",
-                 icon = icon("list"),
-                 badgeLabel = "Step 2",
-                 badgeColor = "orange"),
-        menuItem("Step 3: Optional: Apply Cutoff",
-                 tabName = "blank3",
-                 icon = icon("filter"),
-                 badgeLabel = "Step 3",
-                 badgeColor = "black"),
-        menuItem("Step 4: Run BRINDA Adjustment",
-                 tabName = "blank4",
-                 icon =  icon("calculator"),
-                 badgeLabel = "Step 4",
-                 badgeColor = "black"),
-        menuItem("Step 5: Report",
-                 tabName = "blank5",
-                 icon =  icon("file"),
-                 badgeLabel = "Step 5",
-                 badgeColor = "black")
-      )
-    })
-  })
-  observeEvent(input$setMarkers,{
-    output$sidebarmenu <- renderMenu({
-      sidebarMenu(
-        id = "tabs",
-        menuItem("Step 1: Import Data",
-                 tabName = "import",
-                 icon = icon("cloud-upload"),
-                 badgeLabel = "Step 1",
-                 badgeColor = "yellow"),
-        menuItem("Step 2: Select Biomarkers",
-                 tabName = "select",
-                 icon = icon("list"),
-                 badgeLabel = "Step 2",
-                 badgeColor = "orange",
-                 selected = T),
-        menuItem("Step 3: Optional: Apply Cutoff",
-                 tabName = "cutoff",
-                 icon = icon("filter"),
-                 badgeLabel = "Step 3",
-                 badgeColor = "maroon"),
-        menuItem("Step 4: Run BRINDA Adjustment",
-                 tabName = "blank4",
-                 icon =  icon("calculator"),
-                 badgeLabel = "Step 4",
-                 badgeColor = "black"),
-        menuItem("Step 5: Report",
-                 tabName = "blank5",
-                 icon =  icon("file"),
-                 badgeLabel = "Step 5",
-                 badgeColor = "black")
-      )
-    })
-  })
-  observeEvent(input$setCutoff,{
-    output$sidebarmenu <- renderMenu({
-      sidebarMenu(
-        id = "tabs",
-        menuItem("Step 1: Import Data",
-                 tabName = "import",
-                 icon = icon("cloud-upload"),
-                 badgeLabel = "Step 1",
-                 badgeColor = "yellow"),
-        menuItem("Step 2: Select Biomarkers",
-                 tabName = "select",
-                 icon = icon("list"),
-                 badgeLabel = "Step 2",
-                 badgeColor = "orange"),
-        menuItem("Step 3: Optional: Apply Cutoff",
-                 tabName = "cutoff",
-                 icon = icon("filter"),
-                 badgeLabel = "Step 3",
-                 badgeColor = "maroon",
-                 selected = T),
-        menuItem("Step 4: Run BRINDA Adjustment",
-                 tabName = "brinda",
-                 icon =  icon("calculator"),
-                 badgeLabel = "Step 4",
-                 badgeColor = "maroon"),
-        menuItem("Step 5: Report",
-                 tabName = "blank5",
-                 icon =  icon("file"),
-                 badgeLabel = "Step 5",
-                 badgeColor = "black")
-      )
-    })
-  })
-  observeEvent(input$applyBrinda,{
-    output$sidebarmenu <- renderMenu({
-      sidebarMenu(
-        id = "tabs",
-        menuItem("Step 1: Import Data",
-                 tabName = "import",
-                 icon = icon("cloud-upload"),
-                 badgeLabel = "Step 1",
-                 badgeColor = "yellow"),
-        menuItem("Step 2: Select Biomarkers",
-                 tabName = "select",
-                 icon = icon("list"),
-                 badgeLabel = "Step 2",
-                 badgeColor = "orange"),
-        menuItem("Step 3: Optional: Apply Cutoff",
-                 tabName = "cutoff",
-                 icon = icon("filter"),
-                 badgeLabel = "Step 3",
-                 badgeColor = "maroon"),
-        menuItem("Step 4: Run BRINDA Adjustment",
-                 tabName = "brinda",
-                 icon =  icon("calculator"),
-                 badgeLabel = "Step 4",
-                 badgeColor = "maroon",
-                 selected = T),
-        menuItem("Step 5: Report",
-                 tabName = "report",
-                 icon =  icon("file"),
-                 badgeLabel = "Step 5",
-                 badgeColor = "fuchsia")
-      )
-    })
-  })
-})
-#############################################################################
-## Update Selected Tab Based on Previous/Next Buttons
+  # --- Update Selected Tab Based on Previous/Next Buttons ---------------------
   observeEvent(input$prevImport,{
     updateTabItems(session,
                    "tabs",
@@ -366,30 +357,29 @@ observe({
                    "tabs",
                    "report")
   })
-#############################################################################
-## Updates Column Names Per User's Data
-## Dynamically removes options based on 
-## user's previous choice as to not 
-## select the same column twice
+  # --- Updates Column Names Per User's Data -----------------------------------
+  ## Dynamically removes options based on 
+  ## user's previous choice as to not 
+  ## select the same column twice
   observe({
     updateSelectInput(session, "rbp",
-                      label = "Retinol Binding Protein *",
+                      label = "Retinol Binding Protein",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$rbp)
     updateSelectInput(session, "rt",
-                      label = "Retinol *",
+                      label = "Retinol",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rbp,input$ft,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$rt)
     updateSelectInput(session, "ft",
-                      label = "Ferritin *",
+                      label = "Ferritin",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$rbp,input$stfr,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$ft)
     updateSelectInput(session, "stfr",
-                      label = "Soluble Transferrin Receptor *",
+                      label = "Soluble Transferrin Receptor",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$rbp,input$zn,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$stfr)
     updateSelectInput(session, "zn",
-                      label = "Zinc *",
+                      label = "Zinc",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$rbp,input$agp,input$crp,input$fasting,input$time))]),
                       selected = input$zn)
     updateSelectInput(session, "agp",
@@ -400,29 +390,10 @@ observe({
                       label = "CRP *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting,input$time))]),
                       selected = input$crp)
-    updateSelectInput(session, "fasting",
-                      label = "Fasting Status *",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$time))]),
-                      selected = input$fasting)
-    updateSelectInput(session, "time",
-                      label = "Time of Day *",
-                      choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting))]),
-                      selected = input$time)
-  })
-  
-  observeEvent(input$importData,{
-    output$drag_drop <- renderUI({
-      source(
-        file = "ui_select.R",
-        local = TRUE,
-        encoding = "UTF-8"
-      )$value
-    })
-  })
-#############################################################################
-## Density Plots to be generated
-## each time the user selects what 
-## columns in their data are the marker columns
+
+  # --- Density Plots to be generated ------------------------------------------
+  ## each time the user selects what 
+  ## columns in their data are the marker columns
   output$rbpPlot <- renderPlot({
     req(input$rbp)
     ggplot(imported$data(), aes(x=imported$data()[[as.character(input$rbp)]])) +
@@ -430,7 +401,7 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("Retinol Binding Protein (",as.character(input$rbpU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$rbpU))
   })
@@ -441,7 +412,7 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("Retinol (",as.character(input$rtU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$rtU))
   })
@@ -452,7 +423,7 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("Ferritin (",as.character(input$ftU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$ftU))
   })
@@ -463,7 +434,7 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("Soluble Transferrin Receptor (",as.character(input$stfrU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$stfrU))
   })
@@ -474,7 +445,7 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("Zinc (",as.character(input$znU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$znU))
   })
@@ -485,7 +456,7 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("AGP (",as.character(input$agpU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$agpU))
   })
@@ -496,39 +467,32 @@ observe({
       theme_minimal()+
       ggtitle(
         paste("CRP (",as.character(input$crpU),")",sep="")
-        )+
+      )+
       ylab("")+
       xlab(as.character(input$crpU))
   })
-
-#############################################################################
-## Generates Pop Ups When Certain Population 
-## Groups Are Selected
+  # --- Generates Pop-up when steps are completed ------------------------------
   observe({
-    req(input$pop)
-    if(input$pop == "PSC"){
-      shinyalert("Reference AGP/CRP Values Set",
-                 paste("Reference Value of ln(AGP) set to: -0.52",
-                       "Reference value of ln(CRP) set to: -2.26",
-                       sep="\n"),
-                 type = "info")
-    } else if(input$pop == "WRA"){
-      shinyalert("Reference AGP/CRP Values Set",
-                 paste("ln(AGP) set to: -0.62",
-                       "ln(CRP) set to: -1.83",
-                       sep="\n"),
-                 type="info")
-    } else if(input$pop == "Other"){
-      shinyalert("Reference AGP/CRP Values Set",
-                 paste("ln(AGP) set to: lowest decile of AGP",
-                       "ln(CRP) set to: lowest decile of CRP",
-                       sep="\n"),
-                 type="info")
-    }
+    req(input$setMarkers)
+    shinyalert("DONE",
+               paste("Biomarkers were set successfully."),
+               type = "success")
   })
-#############################################################################
-## Adds in manual AGP/CRP boxes when
-## user selects manual population
+  observe({
+    req(input$setCutoff)
+    shinyalert("DONE",
+               paste("Cutoffs were set successfully."),
+               type = "success")
+  })
+  observe({
+    req(input$applyBrinda)
+    shinyalert("DONE",
+               paste("BRINDA adjustment was applied successfully."),
+               type = "success")
+  })
+  
+  
+  # --- Adds in manual AGP/CRP boxes when user selects manual population -------
   observe({
     req(input$pop)
     if(input$pop == "Manual"){
@@ -545,9 +509,8 @@ observe({
       })
     }
   })
-##############################################################################
-## Cutoff Unit Output
-## Outputs the same unit as specified in step 2
+  # --- Cutoff Unit Output -----------------------------------------------------
+  ## Outputs the same unit as specified in step 2
   output$rbpUnitC <- renderText({
     req(input$rbpU)
     input$rbpU
@@ -576,381 +539,585 @@ observe({
     req(input$znU)
     input$znU
   })
-  ##############################################################################
-  ## Output Deficiency Definition Tables
-
-  output$defImage <- renderUI({
-    width  <- session$clientData$output_defImage_width
-    height <- session$clientData$output_defImage_height
-    img(src="def.png",height=height,width=width)
+  # --- output suggested cutoffs -----------------------------------------------
+  output$rbpSug <- renderText({
+    req(input$rbp)
+    req(input$rbpU)
+    req(input$pop)
+    if(as.character(input$rbpU) == "\u03BCmol/L"){
+      cutoff="0.7 \u03BCmol/L"
+    }else if(as.character(input$rbpU) == "\u03BCg/dL"){
+      cutoff=paste(
+        as.character(0.7 * 0.03491),
+        "\u03BCg/dL"
+      )
+    }
+    return(cutoff)
   })
-  output$defImage <- renderUI({
-    # Read myImage's width and height. These are reactive values, so this
-    # expression will re-run whenever they change.
-    width  <- session$clientData$output_myImage_width
-    height <- session$clientData$output_myImage_height
-    
-    # For high-res displays, this will be greater than 1
-    pixelratio <- session$clientData$pixelratio
-    img(src="def.png",width = width*pixelratio, height = height*pixelratio)
-  
+  output$rtSug <- renderText({
+    req(input$rt)
+    req(input$rtU)
+    req(input$pop)
+    if(as.character(input$rtU) == "\u03BCmol/L"){
+      cutoff="0.7 \u03BCmol/L"
+    }else if(as.character(input$rtU) == "\u03BCg/dL"){
+      cutoff=paste(
+        as.character(0.7 * 0.03491),
+        "\u03BCg/dL"
+      )
+    }
+    return(cutoff)
   })
-##############################################################################
-## Plot cutoff density plots
+  output$ftSug <- renderText({
+    req(input$ft)
+    req(input$ftU)
+    req(input$pop)
+    if(as.character(input$ftU) == "\u03BCg/L" &
+       as.character(input$pop) == "PSC"){
+      cutoff="12 \u03BCg/L"
+    }else if(as.character(input$ftU) == "\u03BCg/L" &
+             as.character(input$pop) == "WRA"){
+      cutoff="15 \u03BCg/L"
+    }else if(as.character(input$ftU) == "ng/mL" &
+             as.character(input$pop) == "PSC"){
+      cutoff="12 ng/mL"
+    }else if(as.character(input$ftU) == "ng/mL" &
+             as.character(input$pop) == "WRA"){
+      cutoff="15 ng/mL"
+    }else if(as.character(input$ftU) == "\u03BCg/L" &
+             !(as.character(input$pop) %in% c("WRA","PSC"))){
+      cutoff="12-15 \u03BCg/L"
+    }else if(as.character(input$ftU) == "ng/mL" &
+             !(as.character(input$pop) %in% c("WRA","PSC"))){
+      cutoff="12-15 ng/mL"
+    }
+    return(cutoff)
+  })
+  output$stfrSug <- renderText({
+    req(input$stfr)
+    req(input$stfrU)
+    req(input$pop)
+    if(as.character(input$stfrU) == "mg/L"){
+      cutoff="8.3 mg/L"
+    }else if(as.character(input$stfrU) == "g/L"){
+      cutoff="8.3 g/L"
+    }
+    return(cutoff)
+  })
+  "\u03BCmol/L"
+  output$znSug <- renderText({
+    req(input$zn)
+    req(input$znU)
+    req(input$pop)
+    req(input$fastingVar)
+    req(input$timeVar)
+    #fastingVarClean <- ifelse()
+    #timeVarClean <- ifelse()
+    if(as.character(input$znU) == "\u03BCmol/L" &
+       as.character(input$pop) == "PSC" &
+       as.character(input$timeVar) == "morning"){
+      cutoff="9.9 \u03BCmol/L"
+    }else if(as.character(input$znU) == "\u03BCmol/L" &
+             as.character(input$pop) == "PSC" &
+             as.character(input$timeVar) != "morning"){
+      cutoff="8.7 \u03BCmol/L"
+    }else if(as.character(input$znU) == "\u03BCmol/L" &
+             as.character(input$pop) == "WRA" &
+             as.character(input$fastingVar) == "fasted" &
+             as.character(input$timeVar) == "morning"){
+      cutoff="10.7 \u03BCmol/L"
+    }else if(as.character(input$znU) == "\u03BCmol/L" &
+             as.character(input$pop) == "WRA" &
+             as.character(input$fastingVar) != "fasted" &
+             as.character(input$timeVar) == "morning"){
+      cutoff="10.1 \u03BCmol/L"
+    }else if(as.character(input$znU) == "\u03BCmol/L" &
+             as.character(input$pop) == "WRA" &
+             as.character(input$timeVar) != "morning"){
+      cutoff="9.0 \u03BCmol/L"
+    }else if(as.character(input$znU) == "\u03BCmol/L" &
+             !(as.character(input$pop) %in% c("WRA","PSC"))){
+      cutoff="9.3-11.3 \u03BCmol/L"
+    }
+    #########################################################
+    else if(as.character(input$znU) == "\u03BCg/L" &
+       as.character(input$pop) == "PSC" &
+       as.character(input$timeVar) == "morning"){
+      cutoff=paste(as.character(9.9*64.5),
+                   "\u03BCg/L")
+    }else if(as.character(input$znU) == "\u03BCg/L" &
+             as.character(input$pop) == "PSC" &
+             as.character(input$timeVar) != "morning"){
+      cutoff=paste(as.character(8.7*64.5),
+                   "\u03BCg/L")
+    }else if(as.character(input$znU) == "\u03BCg/L" &
+             as.character(input$pop) == "WRA" &
+             as.character(input$fastingVar) == "fasted" &
+             as.character(input$timeVar) == "morning"){
+      cutoff=paste(as.character(10.7*64.5),
+                   "\u03BCg/L")
+    }else if(as.character(input$znU) == "\u03BCg/L" &
+             as.character(input$pop) == "WRA" &
+             as.character(input$fastingVar) != "fasted" &
+             as.character(input$timeVar) == "morning"){
+      cutoff=paste(as.character(10.1*64.5),
+                   "\u03BCg/L")
+    }else if(as.character(input$znU) == "\u03BCg/L" &
+             as.character(input$pop) == "WRA" &
+             as.character(input$timeVar) != "morning"){
+      cutoff=paste(as.character(9.0*64.5),
+                   "\u03BCg/L")
+    }else if(as.character(input$znU) == "\u03BCg/L" &
+             !(as.character(input$pop) %in% c("WRA","PSC"))){
+      cutoff="599.9-728.9 \u03BCg/L"
+    }
+    return(cutoff)
+  })
+  # --- Plot cutoff density plots ----------------------------------------------
   cutoffBarPlot <- function(){
-    rbp <-  imported$data() %>%
-      select(c(as.character(input$rbp),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$rbp),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$rbp)]])<as.numeric(input$rbpC),"deficient","normal"))
-    sr <-imported$data() %>%
-      select(c(as.character(input$rt),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$rt),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$rt)]])<as.numeric(input$rtC),"deficient","normal"))
-    sf <- imported$data() %>%
-      select(c(as.character(input$ft),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$ft),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$ft)]])<as.numeric(input$ftC),"deficient","normal"))
-    stfr <-imported$data() %>%
-      select(c(as.character(input$stfr),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$stfr),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$stfr)]])<as.numeric(input$stfrC),"deficient","normal"))
-    agp <- imported$data() %>%
-      select(c(as.character(input$agp),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$agp),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$agp)]])<1,"deficient","normal"))
-    crp <- imported$data() %>%
-      select(c(as.character(input$crp),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$crp),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$crp)]])<5,"deficient","normal"))
-    zn <- imported$data() %>%
-      select(c(as.character(input$zn),as.character(input$fasting),as.character(input$time)))%>%
-      mutate(biomarker=rep(as.character(input$zn),nrow(.)))%>%
-      mutate(deficient=ifelse(
-        (imported$data()[[as.character(input$fasting)]]=="fasted" & imported$data()[[as.character(input$time)]]=="morning" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_fast_C)) |
-          (imported$data()[[as.character(input$fasting)]]=="fasted" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_morn_nonfast_C)) |
-          (imported$data()[[as.character(input$fasting)]]=="non-fasted" & imported$data()[[as.character(input$time)]]=="afternoon" & as.numeric(imported$data()[[as.character(input$zn)]])<as.numeric(input$zn_after_nonfast_C))
-        ,"deficient","normal"))
-    defDf <- rbind.data.frame(
-      rbp %>% select(biomarker,deficient),
-      sr %>% select(biomarker,deficient),
-      sf %>% select(biomarker,deficient),
-      stfr %>% select(biomarker,deficient),
-      zn %>% select(biomarker,deficient),
-      agp %>% select(biomarker,deficient),
-      crp %>% select(biomarker,deficient)
-    ) %>%
-      mutate(value=rep(1,nrow(.)))
-    ggplot(defDf, aes(x = biomarker, y= value, fill = deficient)) +
-      geom_bar(stat="identity", position = "fill", width = 0.5,alpha=0.8) +
+    cutoff_map <- data.frame(
+      variable=c(
+        as.character(input$ft),
+        as.character(input$stfr),
+        as.character(input$rt),
+        as.character(input$rbp),
+        as.character(input$zn),
+        as.character(input$agp),
+        as.character(input$crp)
+      ),
+      cutoff=c(
+        as.numeric(input$ftC),
+        as.numeric(input$stfrC),
+        as.numeric(input$rtC),
+        as.numeric(input$rbpC),
+        as.numeric(input$znC),
+        1,
+        5
+      ),
+      long_name =c(
+        paste0("Ferritin"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+        paste0("Retinol"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+        paste0("Zinc"," (",as.character(input$znU),")"),
+        paste0("AGP"," (",as.character(input$agpU),")"),
+        paste0("CRP"," (",as.character(input$crpU),")")
+      )
+    )
+    
+    def_df <- imported$data() %>%
+      reshape2::melt() %>% 
+      inner_join(.,
+                 cutoff_map,
+                 by="variable") %>%
+      group_by(variable,long_name) %>%
+      mutate(deficient=ifelse(value<cutoff,"deficient","normal"),
+             stfr_deficient=ifelse(value>cutoff,"deficient","normal")) %>%
+      summarise(percent_def=length(deficient[deficient=="deficient"])/
+                  length(deficient)*100,
+                stfr_percent_def=length(stfr_deficient[stfr_deficient=="deficient"])/
+                  length(stfr_deficient)*100)
+    
+    # implementing fix for Soluble Transferrin Receptor deficiency
+    def_df$percent_def[def_df$long_name=="Soluble Transferrin Receptor"] = def_df$stfr_percent_def[def_df$long_name=="Soluble Transferrin Receptor"]
+    
+    # ensure order for biomarkers
+    def_df$long_name <- factor(def_df$long_name,
+                               levels =c(
+                                 paste0("Ferritin"," (",as.character(input$ftU),")"),
+                                 paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+                                 paste0("Retinol"," (",as.character(input$rtU),")"),
+                                 paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+                                 paste0("Zinc"," (",as.character(input$znU),")"),
+                                 paste0("AGP"," (",as.character(input$agpU),")"),
+                                 paste0("CRP"," (",as.character(input$crpU),")")
+                               ))
+    
+    # plot the deficiency for biomarkers
+    ggplot(def_df %>%
+                   mutate(Reference=ifelse(
+                     grepl("agp|crp",long_name,ignore.case = TRUE),
+                     "Reference Biomarker",
+                     "Biomarker")), 
+                 aes(x = long_name, y= percent_def)) +
+      geom_bar(position="dodge",stat="identity",width = 0.5,fill=cols[6]) +
       theme_bw()+
       scale_y_continuous(labels = scales::percent)+
-      xlab("Biomarker")+
-      ylab("Prevalence of Deficiency (%)")
+      ylim(c(0,100))+
+      labs(
+        x="",
+        y="Deficiency (%)",
+        title = "Biomarker Deficiency - Prior to BRINDA"
+      )+
+      theme(text = element_text(size=14),
+            legend.position = "none",
+            axis.text.x =  element_text(angle=45,hjust=1,size=14))+
+      facet_grid(~Reference,scales = "free_x",space = "free")
+    
   }
   output$cutoffBar <- renderPlot({
     req(input$setCutoff)
     print(cutoffBarPlot())
   })
-##############################################################################
-## Apply BRINDA adjustment
-## make brinda variable available outside observe statement
-  observe({
+  # --- Download BRINDA adjusted barplot ---------------------------------------
+  output$downloadNonAdjBar <- downloadHandler(
+    filename = "BRINDA_non_adjusted_barplot.png",
+    content = function(file) {
+      png(file)
+      print(cutoffBarPlot())
+      dev.off()
+    }) 
+  # --- Apply BRINDA adjustment ------------------------------------------------
+  ## make brinda variable available outside observe statement
+  brinda <- reactive({
     req(input$applyBrinda)
-    if (as.character(input$pop) == "WRA"){
-      brinda <<- reactive({
-        req(input$applyBrinda)
-        req(input$pop)
-        df = imported$data() %>%
-          rename(rbp=as.character(input$rbp)) %>%
-          rename(sr=as.character(input$rt)) %>%
-          rename(sf=as.character(input$ft)) %>%
-          rename(stfr=as.character(input$stfr)) %>%
-          rename(zn=as.character(input$zn)) %>%
-          rename(agp=as.character(input$agp)) %>%
-          rename(crp=as.character(input$crp)) 
-        if(as.character(input$outputType == "simple")){
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "WRA",
-            output_format = simple)
-        }else{
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "WRA",
-            output_format = full)
-        }
-        brinda
-      })
-    }else if (as.character(input$pop) == "PSC"){
-      brinda <<- reactive({
-        req(input$applyBrinda)
-        req(input$pop)
-        df = imported$data() %>%
-          rename(rbp=as.character(input$rbp)) %>%
-          rename(sr=as.character(input$rt)) %>%
-          rename(sf=as.character(input$ft)) %>%
-          rename(stfr=as.character(input$stfr)) %>%
-          rename(zn=as.character(input$zn)) %>%
-          rename(agp=as.character(input$agp)) %>%
-          rename(crp=as.character(input$crp)) 
-        if(as.character(input$outputType == "simple")){
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "PSC",
-            output_format = simple)
-        }else{
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "PSC",
-            output_format = full)
-        }
-        brinda
-      })
-    } else if (as.character(input$pop) == "Manual") {
-      brinda <<- reactive({
-        req(input$applyBrinda)
-        req(input$pop)
-        df = imported$data() %>%
-          rename(rbp=as.character(input$rbp)) %>%
-          rename(sr=as.character(input$rt)) %>%
-          rename(sf=as.character(input$ft)) %>%
-          rename(stfr=as.character(input$stfr)) %>%
-          rename(zn=as.character(input$zn)) %>%
-          rename(agp=as.character(input$agp)) %>%
-          rename(crp=as.character(input$crp)) 
-        if(as.character(input$outputType == "simple")){
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "MANUAL",
-            output_format = simple)
-        }else{
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "MANUAL",
-            output_format = full)
-        }
-        brinda
-      })
-    } else if (as.character(input$pop) == "Other") {
-      brinda <<- reactive({
-        req(input$applyBrinda)
-        req(input$pop)
-        df = imported$data() %>%
-          rename(rbp=as.character(input$rbp)) %>%
-          rename(sr=as.character(input$rt)) %>%
-          rename(sf=as.character(input$ft)) %>%
-          rename(stfr=as.character(input$stfr)) %>%
-          rename(zn=as.character(input$zn)) %>%
-          rename(agp=as.character(input$agp)) %>%
-          rename(crp=as.character(input$crp)) 
-        if(as.character(input$outputType == "simple")){
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "OTHER",
-            output_format = simple)
-        }else{
-          brinda <- BRINDA(
-            dataset = df,
-            retinol_binding_protein_varname = rbp,
-            retinol_varname = sr,
-            ferritin_varname = sf,
-            soluble_transferrin_receptor_varname = stfr,
-            zinc_varname = zn,
-            crp_varname = crp,
-            agp_varname = agp,
-            population_group = "OTHER",
-            output_format = full)
-        }
-        brinda
-      })
+    dataset<-imported$data()
+    to_map <- data.frame(
+      variable=c(
+        as.character(input$ft),
+        as.character(input$stfr),
+        as.character(input$rt),
+        as.character(input$rbp),
+        as.character(input$zn),
+        as.character(input$agp),
+        as.character(input$crp)
+      ),
+      long_name =c(
+        "sf",
+        "stfr",
+        "sr",
+        "rbp",
+        "zn",
+        "agp",
+        "crp"
+      )
+    )%>%
+      mutate(variable=ifelse(variable=="",
+                             "not_present",
+                             variable))
+    long_names <- stringi::stri_replace_all_regex(
+      str=names(dataset),
+      pattern=to_map$variable,
+      replacement = to_map$long_name,
+      vectorise_all = FALSE)
+    
+    names(dataset) <- long_names
+    
+    all_names <- ifelse(to_map$long_name %in% long_names,
+                        to_map$long_name,
+                        NA)
+    
+    args=list(
+      retinol_binding_protein_varname=all_names[4],
+      retinol_varname=all_names[3],
+      ferritin_varname=all_names[1],
+      soluble_transferrin_receptor_varname=all_names[2],
+      zinc_varname=all_names[5],
+      crp_varname=all_names[7],
+      agp_varname=all_names[6],
+      population=as.character(input$pop),
+      output_format="FULL"
+    )
+    brinda<-purrr::pmap(args,BRINDA,dataset=dataset)
+    if(as.character(input$outputType)=="only output adjusted values"){
+      adj_names <- c(names(dataset),paste0(names(dataset),"_adj"))
+      adj_names <- adj_names[adj_names %in% names(brinda[[1]])]
+      result <- brinda[[1]] %>%
+        select(all_of(adj_names))
+    }else{
+      result <- brinda[[1]]
     }
+    return(result)
   })
- 
-  #output brinda results table
+  # --- output brinda results table --------------------------------------------
   output$brindaTbl <- renderDataTable({
     req(input$applyBrinda)
     req(input$pop)
+    req(input$outputType)
     df <- brinda()
     datatable(df,options = list(scrollX = T,lengthMenu = c(5,10,25)))
   })
-  ############################################################################
-  ## Barplot of Adjusted/Unadjusted Values
+  # --- Barplot of Adjusted/Unadjusted Values ----------------------------------
   adjBarPlot <- function(){
     df <- brinda()
+    adj_names <-names(df)[grepl("adj|AGP|agp|crp|CRP",names(df))]
+    non_adj_names <- gsub("_adj","",adj_names)
+    both_names <- c(non_adj_names,adj_names)
     tmp=reshape2::melt(
-      df[c(
-        "rbp",
-        "rbp_adj", 
-        "sr",
-        "sr_adj", 
-        "sf",
-        "sf_adj", 
-        "stfr",
-        "stfr_adj", 
-        "zn",
-        "zn_adj",
-        "agp",
-        "crp")])
+      df %>%
+        select(all_of(both_names))
+    )
+    to_map <- data.frame(
+      variable=c(
+        variable=c(
+          "sf",
+          "stfr",
+          "sr",
+          "rbp",
+          "zn",
+          "agp",
+          "crp",
+          "sf_adj",
+          "stfr_adj",
+          "sr_adj",
+          "rbp_adj",
+          "zn_adj"
+        )
+      ),
+      long_name =c(
+        paste0("Ferritin"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+        paste0("Retinol"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+        paste0("Zinc"," (",as.character(input$znU),")"),
+        paste0("AGP"," (",as.character(input$agpU),")"),
+        paste0("CRP"," (",as.character(input$crpU),")"),
+        paste0("Ferritin - Adjusted"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor - Adjusted"," (",as.character(input$stfrU),")"),
+        paste0("Retinol - Adjusted"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein - Adjusted"," (",as.character(input$rbpU),")"),
+        paste0("Zinc - Adjusted"," (",as.character(input$znU),")")
+      )
+    )
+    
     plottingDF <- tmp %>%
       group_by(variable) %>%
       summarize(
         geom_mean = exp(mean(log(value),na.rm=T))
       ) %>%
-      mutate(gen=gsub("_.*","",variable)) %>%
-      mutate(Adjusted = ifelse(grepl("adj",variable),"adjusted","non-adjusted") )
+      mutate(Adjusted = ifelse(grepl("adj",variable),"BRINDA Adjusted","Not Adjusted") ) %>%
+      inner_join(.,
+                 to_map,
+                 by="variable") %>%
+      mutate(base_var=factor(gsub(" - Adjusted","",long_name),
+                             levels=c(
+                               paste0("Ferritin"," (",as.character(input$ftU),")"),
+                               paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+                               paste0("Retinol"," (",as.character(input$rtU),")"),
+                               paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+                               paste0("Zinc"," (",as.character(input$znU),")"),
+                               paste0("AGP"," (",as.character(input$agpU),")"),
+                               paste0("CRP"," (",as.character(input$crpU),")")
+                             )))
     
-    ggplot(plottingDF, aes(x = gen, y= geom_mean, fill = Adjusted)) +
+    ggplot(plottingDF%>%
+             mutate(Reference=ifelse(
+               grepl("agp|crp",base_var,ignore.case = TRUE),
+               "Reference Biomarker",
+               "Biomarker")), aes(x = base_var, y= geom_mean, fill = Adjusted)) +
       geom_bar(stat="identity", width=.5, position = "dodge",alpha=0.8) +
       theme_bw()+
       scale_fill_manual(values = cols[c(2,6)])+
       scale_y_log10()+
-      xlab("Biomarker") +
-      ylab("Geometric Mean")
+      labs(
+        x="",
+        y="Geometric Mean",
+        fill="",
+        title="BRINDA Adjustment Bar Plot"
+      )+
+      theme(text = element_text(size=14),
+            axis.text.x =  element_text(angle=45,hjust=1,size=14))+
+      facet_grid(~Reference,scales = "free_x",space = "free")
   }
-
+  
   output$adjBarPlot <- renderPlot({
     print(adjBarPlot())
   })
   
   defBarPlot <- function(){
-    rbp <-  brinda() %>%
-      select(c("rbp_adj",as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep("rbp_adj",nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(brinda()[["rbp_adj"]])<as.numeric(input$rbpC),"deficient","normal"))
-    sr <- brinda() %>%
-      select(c("sr_adj",as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep("sr_adj",nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(brinda()[["sr_adj"]])<as.numeric(input$rtC),"deficient","normal"))
-    sf <- brinda() %>%
-      select(c("sf_adj",as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep("sf_adj",nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(brinda()[["sf_adj"]])<as.numeric(input$ftC),"deficient","normal"))
-    stfr <- brinda() %>%
-      select(c("stfr_adj",as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep("stfr_adj",nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(brinda()[["stfr_adj"]])<as.numeric(input$stfrC),"deficient","normal"))
-    zn <- brinda() %>%
-      select(c("zn_adj",as.character(input$fasting),as.character(input$time)))%>%
-      mutate(biomarker=rep("zn_adj",nrow(.)))%>%
-      mutate(deficient=ifelse(
-        (brinda()[[as.character(input$fasting)]]=="fasted" & brinda()[[as.character(input$time)]]=="morning" & as.numeric(brinda()[["zn_adj"]])<as.numeric(input$zn_morn_fast_C)) |
-          (brinda()[[as.character(input$fasting)]]=="fasted" & brinda()[[as.character(input$time)]]=="afternoon" & as.numeric(brinda()[["zn_adj"]])<as.numeric(input$zn_morn_nonfast_C)) |
-          (brinda()[[as.character(input$fasting)]]=="non-fasted" & brinda()[[as.character(input$time)]]=="afternoon" & as.numeric(brinda()[["zn_adj"]])<as.numeric(input$zn_after_nonfast_C))
-        ,"deficient","normal"))
-    agp <- imported$data() %>%
-      select(c(as.character(input$agp),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$agp),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$agp)]])<1,"deficient","normal"))
-    crp <- imported$data() %>%
-      select(c(as.character(input$crp),as.character(input$fasting),as.character(input$time))) %>%
-      mutate(biomarker=rep(as.character(input$crp),nrow(.)))%>%
-      mutate(deficient=ifelse(as.numeric(imported$data()[[as.character(input$crp)]])<5,"deficient","normal"))
+    df <- brinda()
+    adj_names <-names(df)[grepl("adj|AGP|agp|crp|CRP",names(df))]
+    non_adj_names <- gsub("_adj","",adj_names)
+    both_names <- c(non_adj_names,adj_names)
+    adj_v_non_adj= df %>%
+      select(all_of(both_names))
+    cutoff_map <- data.frame(
+      variable=c(
+        variable=c(
+          "sf",
+          "stfr",
+          "sr",
+          "rbp",
+          "zn",
+          "agp",
+          "crp",
+          "sf_adj",
+          "stfr_adj",
+          "sr_adj",
+          "rbp_adj",
+          "zn_adj"
+        )
+      ),
+      cutoff=c(
+        as.numeric(input$ftC),
+        as.numeric(input$stfrC),
+        as.numeric(input$rtC),
+        as.numeric(input$rbpC),
+        as.numeric(input$znC),
+        1,
+        5,
+        as.numeric(input$ftC),
+        as.numeric(input$stfrC),
+        as.numeric(input$rtC),
+        as.numeric(input$rbpC),
+        as.numeric(input$znC)
+      ),
+      long_name =c(
+        paste0("Ferritin"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+        paste0("Retinol"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+        paste0("Zinc"," (",as.character(input$znU),")"),
+        paste0("AGP"," (",as.character(input$agpU),")"),
+        paste0("CRP"," (",as.character(input$crpU),")"),
+        paste0("Ferritin - Adjusted"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor - Adjusted"," (",as.character(input$stfrU),")"),
+        paste0("Retinol - Adjusted"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein - Adjusted"," (",as.character(input$rbpU),")"),
+        paste0("Zinc - Adjusted"," (",as.character(input$znU),")")
+        
+      )
+    )
     
-    defDf <- rbind.data.frame(
-      rbp %>% select(biomarker,deficient),
-      sr %>% select(biomarker,deficient),
-      sf %>% select(biomarker,deficient),
-      stfr %>% select(biomarker,deficient),
-      zn %>% select(biomarker,deficient),
-      agp %>% select(biomarker,deficient),
-      crp %>% select(biomarker,deficient)
-      
-    ) %>%
-      mutate(value=rep(1,nrow(.)))
-    ggplot(defDf, aes(x = biomarker, y= value, fill = deficient)) +
-      geom_bar(stat="identity", position = "fill", width = 0.5,alpha=0.8) +
+    def_df <- adj_v_non_adj %>%
+      reshape2::melt() %>% 
+      inner_join(.,
+                 cutoff_map,
+                 by="variable") %>%
+      group_by(variable,long_name) %>%
+      mutate(deficient=ifelse(value<cutoff,"deficient","normal"),
+             stfr_deficient=ifelse(value>cutoff,"deficient","normal")) %>%
+      summarise(percent_def=length(deficient[deficient=="deficient"])/
+                  length(deficient)*100,
+                stfr_percent_def=length(stfr_deficient[stfr_deficient=="deficient"])/
+                  length(stfr_deficient)*100)
+    
+    # implementing fix for Soluble Transferrin Receptor deficiency
+    def_df$percent_def[def_df$long_name=="Soluble Transferrin Receptor"] = def_df$stfr_percent_def[def_df$long_name=="Soluble Transferrin Receptor"]
+    
+    # add in the biomarker column
+    def_df$base_var <- factor(gsub(" - Adjusted","",def_df$long_name),
+                              levels = c(
+                                paste0("Ferritin"," (",as.character(input$ftU),")"),
+                                paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+                                paste0("Retinol"," (",as.character(input$rtU),")"),
+                                paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+                                paste0("Zinc"," (",as.character(input$znU),")"),
+                                paste0("AGP"," (",as.character(input$agpU),")"),
+                                paste0("CRP"," (",as.character(input$crpU),")")
+                              ))
+    def_df$adj <- ifelse(grepl("Adjusted",def_df$long_name),
+                         "BRINDA Adjusted",
+                         "Not Adjusted"
+    )
+    
+    # plot the deficiency for biomarkers
+    ggplot(def_df%>%
+             mutate(Reference=ifelse(
+               grepl("agp|crp",base_var,ignore.case = TRUE),
+               "Reference Biomarker",
+               "Biomarker")), aes(x = base_var, y= percent_def,fill=adj)) +
+      geom_bar(position="dodge",stat="identity",width = 0.5) +
       theme_bw()+
       scale_y_continuous(labels = scales::percent)+
-      xlab("Biomarker")+
-      ylab("Prevalence of Deficiency (%)")
+      scale_fill_manual(values=cols[c(2,6)])+
+      ylim(c(0,100))+
+      labs(
+        x="",
+        y="Deficiency (%)",
+        title = "Biomarker Deficiency",
+        fill=""
+      )+
+      theme(text = element_text(size=14),
+            axis.text.x =  element_text(angle=45,hjust=1,size=14))+
+        facet_grid(~Reference,scales = "free_x",space = "free")
   }
-  
   output$defBarPlot <- renderPlot({
     print(defBarPlot())
   })
   
   density <- function(){
     df <- brinda()
-    tmp=reshape2::melt(
-      df[c(
-        "rbp",
-        "rbp_adj", 
-        "sr",
-        "sr_adj", 
-        "sf",
-        "sf_adj", 
-        "stfr",
-        "stfr_adj", 
-        "zn",
-        "zn_adj",
-        "agp",
-        "crp")])
-    plottingDF <- tmp %>%
-      mutate(gen=gsub("_.*","",variable)) %>%
-      mutate(Adjusted = ifelse(grepl("adj",variable),"adjusted","non-adjusted") )
+    adj_names <-names(df)[grepl("adj|AGP|agp|crp|CRP",names(df))]
+    non_adj_names <- gsub("_adj","",adj_names)
+    both_names <- c(non_adj_names,adj_names)
     
-    ggplot(plottingDF, aes(y=gen,x=value,fill=Adjusted)) +
+    to_map <- data.frame(
+      variable=c(
+        variable=c(
+          "sf",
+          "stfr",
+          "sr",
+          "rbp",
+          "zn",
+          "agp",
+          "crp",
+          "sf_adj",
+          "stfr_adj",
+          "sr_adj",
+          "rbp_adj",
+          "zn_adj"
+        )
+      ),
+      long_name =c(
+        paste0("Ferritin"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+        paste0("Retinol"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+        paste0("Zinc"," (",as.character(input$znU),")"),
+        paste0("AGP"," (",as.character(input$agpU),")"),
+        paste0("CRP"," (",as.character(input$crpU),")"),
+        paste0("Ferritin - Adjusted"," (",as.character(input$ftU),")"),
+        paste0("Soluble Transferrin Receptor - Adjusted"," (",as.character(input$stfrU),")"),
+        paste0("Retinol - Adjusted"," (",as.character(input$rtU),")"),
+        paste0("Retinol Binding Protein - Adjusted"," (",as.character(input$rbpU),")"),
+        paste0("Zinc - Adjusted"," (",as.character(input$znU),")")
+      )
+    )
+    
+    tmp=reshape2::melt(
+      df %>%
+        select(all_of(both_names))
+    ) %>%
+      mutate(Adjusted = ifelse(grepl("adj",variable),"BRINDA Adjusted","Not Adjusted")) %>%
+      inner_join(
+        .,
+        to_map,
+        by=c("variable")
+      ) %>%
+      mutate(base_var = factor(gsub(" - Adjusted","",long_name),
+                               levels = c(
+                                 paste0("CRP"," (",as.character(input$crpU),")"),
+                                 paste0("AGP"," (",as.character(input$agpU),")"),
+                                 paste0("Zinc"," (",as.character(input$znU),")"),
+                                 paste0("Retinol Binding Protein"," (",as.character(input$rbpU),")"),
+                                 paste0("Retinol"," (",as.character(input$rtU),")"),
+                                 paste0("Soluble Transferrin Receptor"," (",as.character(input$stfrU),")"),
+                                 paste0("Ferritin"," (",as.character(input$ftU),")")
+                               )))
+    
+    ggplot(tmp%>%
+             mutate(Reference=ifelse(
+               grepl("agp|crp",base_var,ignore.case = TRUE),
+               "Reference Biomarker",
+               "Biomarker")), aes(y=base_var,x=value,fill=Adjusted)) +
       geom_density_ridges(color="darkslategrey",alpha=0.8)+
       scale_fill_manual(values = cols[c(2,6)])+
       theme_bw()+
       scale_x_log10()+
-      xlab("Biomarker Value")+
-      ylab("Biomarker")
+      labs(
+        x="",
+        y="",
+        fill="",
+        title="BRINDA Adjustment Density Plot"
+      )+
+      theme(text = element_text(size=14))+
+      facet_grid(Reference~,scales = "free_x",space = "free")
   }
   output$densityplot <- renderPlot({
     print(density())
   })
-#############################################################################
-## Download BRINDA adjusted table
+  # --- Download BRINDA adjusted table -----------------------------------------
   output$downloadRes <- downloadHandler(
     filename = function() {
       paste("BRINDA_Results", ".csv", sep = "")
@@ -958,8 +1125,7 @@ observe({
     content = function(file) {
       write.csv(brinda(), file, row.names = FALSE)
     })
-#############################################################################
-## Download BRINDA adjusted barplot
+  # --- Download BRINDA adjusted barplot ---------------------------------------
   output$downloadAdjBar <- downloadHandler(
     filename = "BRINDA_adjustment_barplot.png",
     content = function(file) {
@@ -967,8 +1133,7 @@ observe({
       print(adjBarPlot())
       dev.off()
     })  
-#############################################################################
-## Download BRINDA adjusted barplot
+  # --- Download BRINDA adjusted barplot ---------------------------------------
   output$downloadDefBar <- downloadHandler(
     filename = "BRINDA_deficiency_barplot.png",
     content = function(file) {
@@ -976,8 +1141,7 @@ observe({
       print(defBarPlot())
       dev.off()
     }) 
-#############################################################################
-## Download BRINDA adjusted density plot
+  # --- Download BRINDA adjusted density plot ----------------------------------
   output$downloadDensity <- downloadHandler(
     filename = "BRINDA_densityplot.png",
     content = function(file) {
@@ -985,8 +1149,7 @@ observe({
       print(density())
       dev.off()
     }) 
-#############################################################################
-## Download BRINDA adjusted table
+  # --- Download BRINDA adjusted table -----------------------------------------
   output$downloadRes2 <- downloadHandler(
     filename = function() {
       paste("BRINDA_Results", ".csv", sep = "")
@@ -994,157 +1157,348 @@ observe({
     content = function(file) {
       write.csv(brinda(), file, row.names = FALSE)
     })
-#############################################################################
-## Create a stats object
+  # --- Create a stats object --------------------------------------------------
   stats <- function(){
-    rbp <- imported$data() %>%
-      select(as.character(input$rbp)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="Retinol Binding Protein",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    sr <- imported$data() %>%
-      select(as.character(input$rt)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="Retinol",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    sf <- imported$data() %>%
-      select(as.character(input$ft)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="Ferritin",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    stfr <- imported$data() %>%
-      select(as.character(input$stfr)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="Soluble Transferrin Receptor",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    zn <- imported$data() %>%
-      select(as.character(input$zn)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="Zinc",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    agp <- imported$data() %>%
-      select(as.character(input$agp)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="AGP",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    crp <- imported$data() %>%
-      select(as.character(input$crp)) %>%
-      mutate(across(.cols=1, .fns=as.numeric)) %>%
-      summarise(
-        Biomarker="CRP",
-        `Variable Name` =colnames(.),
-        N=length(.[!is.na(.)]),
-        Minimum=min(.[!is.na(.)],na.rm = T),
-        Mean=mean(.[!is.na(.)],na.rm=T),
-        `Geometric Mean`=exp(mean(log(.[!is.na(.)]),na.rm=T)),
-        Median=median(.[!is.na(.)],na.rm = T),
-        Max=max(.[!is.na(.)],na.rm=T))
-    df <- rbind.data.frame(
-      rbp,
-      sr,
-      sf,
-      stfr,
-      zn,
-      agp,
-      crp
+    to_map <- data.frame(
+      variable=c(
+          as.character(input$ft),
+          as.character(input$stfr),
+          as.character(input$rt),
+          as.character(input$rbp),
+          as.character(input$zn),
+          as.character(input$agp),
+          as.character(input$crp)
+      ),
+      Biomarker =c(
+        "Ferritin",
+        "Soluble Transferrin Receptor",
+        "Retinol",
+        "Retinol Binding Protein",
+        "Zinc",
+        "AGP",
+        "CRP"
+      ),
+      Unit = c(
+        as.character(input$ftU),
+        as.character(input$stfrU),
+        as.character(input$rtU),
+        as.character(input$rbpU),
+        as.character(input$znU),
+        as.character(input$agpU),
+        as.character(input$crpU)
+      )
     )
-    df <- cbind(df[,1:2],apply(df[,3:8],2,function(x){round(x,digits = 2)}))
-    return(df)
+    
+    stats <- imported$data() %>%
+      reshape2::melt() %>%
+      group_by(variable) %>%
+      summarise(
+        N=length(value[!is.na(value)]),
+        Minimum=min(value[!is.na(value)],na.rm = T),
+        Mean=mean(value[!is.na(value)],na.rm=T),
+        `Geometric Mean`=exp(mean(log(value[!is.na(value)]),na.rm=T)),
+        Median=median(value[!is.na(value)],na.rm = T),
+        Max=max(value[!is.na(value)],na.rm=T)) 
+    
+    stats_w_biomarker <- to_map %>%
+      inner_join(.,
+                 stats,
+                 by="variable") %>%
+      rename("Variable"="variable")
   }
-#############################################################################
-## Download BRINDA adjustment Report
-
+  
+  init_def <- function(){
+    cutoff_map <- data.frame(
+      variable=c(
+        as.character(input$ft),
+        as.character(input$stfr),
+        as.character(input$rt),
+        as.character(input$rbp),
+        as.character(input$zn),
+        as.character(input$agp),
+        as.character(input$crp)
+      ),
+      cutoff=c(
+        as.numeric(input$ftC),
+        as.numeric(input$stfrC),
+        as.numeric(input$rtC),
+        as.numeric(input$rbpC),
+        as.numeric(input$znC),
+        1,
+        5
+      ),
+      unit=c(
+        as.character(input$ftU),
+        as.character(input$stfrU),
+        as.character(input$rtU),
+        as.character(input$rbpU),
+        as.character(input$znU),
+        as.character(input$agpU),
+        as.character(input$crpU)
+      ),
+      Biomarker =c(
+        "Ferritin",
+        "Soluble Transferrin Receptor",
+        "Retinol",
+        "Retinol Binding Protein",
+        "Zinc",
+        "AGP",
+        "CRP"
+        
+      )
+    )
+    
+    def_df <- imported$data() %>%
+      reshape2::melt() %>% 
+      inner_join(.,
+                 cutoff_map,
+                 by="variable") %>%
+      group_by(variable,Biomarker,unit,cutoff) %>%
+      mutate(deficient=ifelse(value<cutoff,"deficient","normal"),
+             stfr_deficient=ifelse(value>cutoff,"deficient","normal")) %>%
+      summarise(`Percent Deficiency`=length(deficient[deficient=="deficient"])/
+                  length(deficient)*100,
+                stfr_percent_def=length(stfr_deficient[stfr_deficient=="deficient"])/
+                  length(stfr_deficient)*100) %>%
+      ungroup()
+    
+    # implementing fix for Soluble Transferrin Receptor deficiency
+    if("Soluble Transferrin Receptor" %in% def_df$Biomarker){
+      def_df$`Percent Deficiency` <- ifelse(def_df$Biomarker == "Soluble Transferrin Receptor",
+                                            def_df$stfr_percent_def,
+                                            def_df$`Percent Deficiency`)
+      def_df <- def_df %>%
+        filter(!is.na(cutoff)) %>%
+        mutate(`Value Cutoff`= ifelse(Biomarker == "Soluble Transferrin Receptor",
+                                      paste(">",as.character(cutoff),unit),
+                                      paste("<",as.character(cutoff),unit)
+        )) %>%
+        select(-c(stfr_percent_def,cutoff,unit)) %>%
+        rename("Variable"="variable")
+    }else{
+      def_df <- def_df %>%
+        filter(!is.na(cutoff)) %>%
+        mutate(`Value Cutoff`= ifelse(Biomarker == "Soluble Transferrin Receptor",
+                                      paste(">",as.character(cutoff),unit),
+                                      paste("<",as.character(cutoff),unit)
+        )) %>%
+        select(-c(stfr_percent_def,cutoff,unit)) %>%
+        rename("Variable"="variable")
+    }
+    return(def_df)
+  }
+  
+  adj_def_df <- function(){
+    cutoff_map <- data.frame(
+      variable=c(
+        "sf",
+        "stfr",
+        "sr",
+        "rbp",
+        "zn",
+        "agp",
+        "crp",
+        "sf_adj",
+        "stfr_adj",
+        "sr_adj",
+        "rbp_adj",
+        "zn_adj"
+      ),
+      Biomarker =c(
+        "Ferritin",
+        "Soluble Transferrin Receptor",
+        "Retinol",
+        "Retinol Binding Protein",
+        "Zinc",
+        "AGP",
+        "CRP",
+        "Ferritin - Adjusted",
+        "Soluble Transferrin Receptor - Adjusted",
+        "Retinol - Adjusted",
+        "Retinol Binding Protein - Adjusted",
+        "Zinc - Adjusted"
+      ),
+      cutoff=c(
+        as.numeric(input$ftC),
+        as.numeric(input$stfrC),
+        as.numeric(input$rtC),
+        as.numeric(input$rbpC),
+        as.numeric(input$znC),
+        1,
+        5,
+        as.numeric(input$ftC),
+        as.numeric(input$stfrC),
+        as.numeric(input$rtC),
+        as.numeric(input$rbpC),
+        as.numeric(input$znC)
+      ),
+      unit=c(
+        as.character(input$ftU),
+        as.character(input$stfrU),
+        as.character(input$rtU),
+        as.character(input$rbpU),
+        as.character(input$znU),
+        as.character(input$agpU),
+        as.character(input$crpU),
+        as.character(input$ftU),
+        as.character(input$stfrU),
+        as.character(input$rtU),
+        as.character(input$rbpU),
+        as.character(input$znU)
+      )
+    )
+    
+    def_df <- brinda() %>%
+      reshape2::melt() %>% 
+      inner_join(.,
+                 cutoff_map,
+                 by="variable") %>%
+      group_by(variable,Biomarker,unit,cutoff) %>%
+      mutate(deficient=ifelse(value<cutoff,"deficient","normal"),
+             stfr_deficient=ifelse(value>cutoff,"deficient","normal")) %>%
+      summarise(`Percent Deficiency`=length(deficient[deficient=="deficient"])/
+                  length(deficient)*100,
+                stfr_percent_def=length(stfr_deficient[stfr_deficient=="deficient"])/
+                  length(stfr_deficient)*100) %>%
+      ungroup()
+    
+    # implementing fix for Soluble Transferrin Receptor deficiency
+    if("Soluble Transferrin Receptor" %in% def_df$Biomarker){
+      def_df$`Percent Deficiency` <- ifelse(def_df$Biomarker == "Soluble Transferrin Receptor",
+                                            def_df$stfr_percent_def,
+                                            def_df$`Percent Deficiency`)
+      def_df <- def_df %>%
+        filter(!is.na(cutoff)) %>%
+        mutate(`Value Cutoff`= ifelse(Biomarker == "Soluble Transferrin Receptor",
+                                      paste(">",as.character(cutoff),unit),
+                                      paste("<",as.character(cutoff),unit)
+        )) %>%
+        select(-c(stfr_percent_def,cutoff,unit)) %>%
+        rename("Variable"="variable")
+    }else{
+      def_df <- def_df %>%
+        filter(!is.na(cutoff)) %>%
+        mutate(`Value Cutoff`= ifelse(Biomarker == "Soluble Transferrin Receptor",
+                                      paste(">",as.character(cutoff),unit),
+                                      paste("<",as.character(cutoff),unit)
+        )) %>%
+        select(-c(stfr_percent_def,cutoff,unit)) %>%
+        rename("Variable"="variable")
+    }
+    return(def_df)
+  }
+  # --- Download BRINDA adjustment Report --------------------------------------
   output$report <- downloadHandler(
     filename = function() {
-      paste('my-report', sep = '.', switch(
+      paste('BRINDA_Adjustment_Report', sep = '.', switch(
         input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
       ))
     },
-    
+
     content = function(file) {
-      src <- normalizePath('./reports/report.Rmd')
-      
-      # temporarily switch to the temp dir, in case you do not have write
-      # permission to the current working directory
-      owd <- setwd(tempdir())
-      on.exit(setwd(owd))
-      file.copy(src, 'report.Rmd', overwrite = TRUE)
-      
-      library(rmarkdown)
-      out <- render('report.Rmd',
-                    switch(
-        input$format,
-        PDF = pdf_document(), HTML = html_document(), Word = word_document()),
-        params = list(data = imported$data(),
-                      rbp = input$rbp,
-                      rt = input$rt,
-                      ft = input$ft,
-                      stfr = input$stfr,
-                      zn = input$zn,
-                      agp = input$agp,
-                      crp = input$crp,
-                      pop = input$pop,
-                      rbpC = input$rbpC,
-                      rtC = input$rtC,
-                      ftC = input$ftC,
-                      stfrC = input$stfrC,
-                      zn_morn_fast_C = input$zn_morn_fast_C,
-                      zn_morn_nonfast_C = input$zn_morn_nonfast_C ,
-                      zn_after_nonfast_C = input$zn_after_nonfast_C ,
-                      initCut = cutoffBarPlot(),
-                      refAgp = input$refAgp,
-                      refCrp = input$refCrp,
-                      stats = stats(),
-                      adjBar = adjBarPlot(),
-                      defBar = defBarPlot(),
-                      density = density()))
-      file.rename(out, file)
+      shinyalert("DONE",
+                 paste("BRINDA adjustment report was generated successfully."),
+                 type = "success")
+      shiny::withProgress(
+        message = paste0("Rendering", input$report, " Report"),
+        value = 0,
+        {
+          shiny::incProgress(1/10)
+          Sys.sleep(1)
+          shiny::incProgress(5/10)
+          src <- normalizePath('./reports/report.Rmd')
+          
+          # temporarily switch to the temp dir, in case you do not have write
+          # permission to the current working directory
+          owd <- setwd(tempdir())
+          on.exit(setwd(owd))
+          file.copy(src, 'report.Rmd', overwrite = TRUE)
+          
+          library(rmarkdown)
+          out <- render('report.Rmd',
+                        switch(
+                          input$format,
+                          PDF = pdf_document(),
+                          HTML = html_document(
+                            toc = TRUE,
+                            toc_depth = 3,
+                            toc_float = TRUE,
+                            theme = "simplex"
+                          ),
+                          Word = word_document()),
+                        params = list(data = imported$data(),
+                                      rbp = input$rbp,
+                                      rt = input$rt,
+                                      ft = input$ft,
+                                      stfr = input$stfr,
+                                      zn = input$zn,
+                                      agp = input$agp,
+                                      crp = input$crp,
+                                      pop = input$pop,
+                                      rbpC = input$rbpC,
+                                      rtC = input$rtC,
+                                      ftC = input$ftC,
+                                      stfrC = input$stfrC,
+                                      znC = input$znC,
+                                      initCut = cutoffBarPlot(),
+                                      refAgp = input$refAgp,
+                                      refCrp = input$refCrp,
+                                      stats = stats(),
+                                      init_df = init_def(),
+                                      adj_def_df = adj_def_df(),
+                                      adjBar = adjBarPlot(),
+                                      defBar = defBarPlot(),
+                                      density = density()))
+          file.rename(out, file)
+          shiny::incProgress(10/10)
+        }
+      )
+      # src <- normalizePath('./reports/report.Rmd')
+      # 
+      # # temporarily switch to the temp dir, in case you do not have write
+      # # permission to the current working directory
+      # owd <- setwd(tempdir())
+      # on.exit(setwd(owd))
+      # file.copy(src, 'report.Rmd', overwrite = TRUE)
+      # 
+      # library(rmarkdown)
+      # out <- render('report.Rmd',
+      #               switch(
+      #                 input$format,
+      #                 PDF = pdf_document(),
+      #                 HTML = html_document(
+      #                   toc = TRUE,
+      #                   toc_depth = 3,
+      #                   toc_float = TRUE,
+      #                   theme = "simplex"
+      #                 ),
+      #                 Word = word_document()),
+      #               params = list(data = imported$data(),
+      #                             rbp = input$rbp,
+      #                             rt = input$rt,
+      #                             ft = input$ft,
+      #                             stfr = input$stfr,
+      #                             zn = input$zn,
+      #                             agp = input$agp,
+      #                             crp = input$crp,
+      #                             pop = input$pop,
+      #                             rbpC = input$rbpC,
+      #                             rtC = input$rtC,
+      #                             ftC = input$ftC,
+      #                             stfrC = input$stfrC,
+      #                             znC = input$znC,
+      #                             initCut = cutoffBarPlot(),
+      #                             refAgp = input$refAgp,
+      #                             refCrp = input$refCrp,
+      #                             stats = stats(),
+      #                             init_df = init_def(),
+      #                             adj_def_df = adj_def_df(),
+      #                             adjBar = adjBarPlot(),
+      #                             defBar = defBarPlot(),
+      #                             density = density()))
+      # file.rename(out, file)
     }
   )
 }
-###########################################################
-## Shiny Server and UI Call
+# --- Shiny Server and UI Call -------------------------------------------------
 shinyApp(ui, server)
-###########################################################
