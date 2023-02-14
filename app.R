@@ -11,7 +11,6 @@ library(patchwork)
 library(ggridges)
 library(BRINDA)
 library(fresh)
-source("./R/unit_converter.R")
 
 # --- Shiny theme --------------------------------------------------------------
 mytheme <- create_theme(
@@ -59,7 +58,7 @@ body <- dashboardPage(
         src="logo1.png",
         style = "height:95px;")
     )),
-
+  
   # --- sidebar ----------------------------------------------------------------
   dashboardSidebar(
     tags$style(".left-side, .main-sidebar {padding-top: 100px;}"),
@@ -390,7 +389,8 @@ server <- function(input, output, session) {
                       label = "CRP *",
                       choices = c("",names(imported$data())[!(names(imported$data()) %in% c(input$rt,input$ft,input$stfr,input$zn,input$agp,input$rbp,input$fasting,input$time))]),
                       selected = input$crp)
-
+  })
+ 
   # --- Density Plots to be generated ------------------------------------------
   ## each time the user selects what 
   ## columns in their data are the marker columns
@@ -471,6 +471,7 @@ server <- function(input, output, session) {
       ylab("")+
       xlab(as.character(input$crpU))
   })
+ 
   # --- Generates Pop-up when steps are completed ------------------------------
   observe({
     req(input$setMarkers)
@@ -611,8 +612,6 @@ server <- function(input, output, session) {
     req(input$pop)
     req(input$fastingVar)
     req(input$timeVar)
-    #fastingVarClean <- ifelse()
-    #timeVarClean <- ifelse()
     if(as.character(input$znU) == "\u03BCmol/L" &
        as.character(input$pop) == "PSC" &
        as.character(input$timeVar) == "morning"){
@@ -641,8 +640,8 @@ server <- function(input, output, session) {
     }
     #########################################################
     else if(as.character(input$znU) == "\u03BCg/L" &
-       as.character(input$pop) == "PSC" &
-       as.character(input$timeVar) == "morning"){
+            as.character(input$pop) == "PSC" &
+            as.character(input$timeVar) == "morning"){
       cutoff=paste(as.character(9.9*64.5),
                    "\u03BCg/L")
     }else if(as.character(input$znU) == "\u03BCg/L" &
@@ -673,6 +672,7 @@ server <- function(input, output, session) {
     }
     return(cutoff)
   })
+  
   # --- Plot cutoff density plots ----------------------------------------------
   cutoffBarPlot <- function(){
     cutoff_map <- data.frame(
@@ -735,11 +735,11 @@ server <- function(input, output, session) {
     
     # plot the deficiency for biomarkers
     ggplot(def_df %>%
-                   mutate(Reference=ifelse(
-                     grepl("agp|crp",long_name,ignore.case = TRUE),
-                     "Reference Biomarker",
-                     "Biomarker")), 
-                 aes(x = long_name, y= percent_def)) +
+             mutate(Reference=ifelse(
+               grepl("agp|crp",long_name,ignore.case = TRUE),
+               "Reference Biomarker",
+               "Biomarker")), 
+           aes(x = long_name, y= percent_def)) +
       geom_bar(position="dodge",stat="identity",width = 0.5,fill=cols[6]) +
       theme_bw()+
       scale_y_continuous(labels = scales::percent)+
@@ -829,6 +829,7 @@ server <- function(input, output, session) {
     }
     return(result)
   })
+  
   # --- output brinda results table --------------------------------------------
   output$brindaTbl <- renderDataTable({
     req(input$applyBrinda)
@@ -1030,8 +1031,10 @@ server <- function(input, output, session) {
       )+
       theme(text = element_text(size=14),
             axis.text.x =  element_text(angle=45,hjust=1,size=14))+
-        facet_grid(~Reference,scales = "free_x",space = "free")
+      facet_grid(~Reference,scales = "free_x",space = "free")
   }
+  
+  
   output$defBarPlot <- renderPlot({
     print(defBarPlot())
   })
@@ -1112,8 +1115,9 @@ server <- function(input, output, session) {
         title="BRINDA Adjustment Density Plot"
       )+
       theme(text = element_text(size=14))+
-      facet_grid(Reference~,scales = "free_x",space = "free")
+      facet_grid(Reference~.,scales = "free_x",space = "free")
   }
+  
   output$densityplot <- renderPlot({
     print(density())
   })
@@ -1161,13 +1165,13 @@ server <- function(input, output, session) {
   stats <- function(){
     to_map <- data.frame(
       variable=c(
-          as.character(input$ft),
-          as.character(input$stfr),
-          as.character(input$rt),
-          as.character(input$rbp),
-          as.character(input$zn),
-          as.character(input$agp),
-          as.character(input$crp)
+        as.character(input$ft),
+        as.character(input$stfr),
+        as.character(input$rt),
+        as.character(input$rbp),
+        as.character(input$zn),
+        as.character(input$agp),
+        as.character(input$crp)
       ),
       Biomarker =c(
         "Ferritin",
@@ -1387,6 +1391,7 @@ server <- function(input, output, session) {
     }
     return(def_df)
   }
+  
   # --- Download BRINDA adjustment Report --------------------------------------
   output$report <- downloadHandler(
     filename = function() {
@@ -1394,7 +1399,7 @@ server <- function(input, output, session) {
         input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
       ))
     },
-
+    
     content = function(file) {
       shinyalert("DONE",
                  paste("BRINDA adjustment report was generated successfully."),
@@ -1453,50 +1458,6 @@ server <- function(input, output, session) {
           shiny::incProgress(10/10)
         }
       )
-      # src <- normalizePath('./reports/report.Rmd')
-      # 
-      # # temporarily switch to the temp dir, in case you do not have write
-      # # permission to the current working directory
-      # owd <- setwd(tempdir())
-      # on.exit(setwd(owd))
-      # file.copy(src, 'report.Rmd', overwrite = TRUE)
-      # 
-      # library(rmarkdown)
-      # out <- render('report.Rmd',
-      #               switch(
-      #                 input$format,
-      #                 PDF = pdf_document(),
-      #                 HTML = html_document(
-      #                   toc = TRUE,
-      #                   toc_depth = 3,
-      #                   toc_float = TRUE,
-      #                   theme = "simplex"
-      #                 ),
-      #                 Word = word_document()),
-      #               params = list(data = imported$data(),
-      #                             rbp = input$rbp,
-      #                             rt = input$rt,
-      #                             ft = input$ft,
-      #                             stfr = input$stfr,
-      #                             zn = input$zn,
-      #                             agp = input$agp,
-      #                             crp = input$crp,
-      #                             pop = input$pop,
-      #                             rbpC = input$rbpC,
-      #                             rtC = input$rtC,
-      #                             ftC = input$ftC,
-      #                             stfrC = input$stfrC,
-      #                             znC = input$znC,
-      #                             initCut = cutoffBarPlot(),
-      #                             refAgp = input$refAgp,
-      #                             refCrp = input$refCrp,
-      #                             stats = stats(),
-      #                             init_df = init_def(),
-      #                             adj_def_df = adj_def_df(),
-      #                             adjBar = adjBarPlot(),
-      #                             defBar = defBarPlot(),
-      #                             density = density()))
-      # file.rename(out, file)
     }
   )
 }
