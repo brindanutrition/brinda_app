@@ -58,7 +58,7 @@ knitr::kable(params$init_df,format="markdown") %>%
 # knitr::kable(params$init_df)
 ```
 
-```{r cutoff,echo=FALSE,warning=F,message=FALSE}
+```{r cutoff,echo=FALSE,warning=F,message=FALSE,fig.width=10}
 library(ggplot2)
 
 params$initCut
@@ -93,11 +93,11 @@ if(population == "PSC"){
 
 The biomarker values have been adjusted and the difference between adjusted and unadjusted values are displayed below:
 
-```{r adjustment_bar,echo=FALSE,warning=F,message=FALSE}
+```{r adjustment_bar,echo=FALSE,warning=F,message=FALSE,,fig.width=10}
 params$adjBar
 ```
 
-```{r adjustment_density,echo=FALSE,warning=F,message=FALSE}
+```{r adjustment_density,echo=FALSE,warning=F,message=FALSE,,fig.width=10}
 params$density
 ```
 
@@ -113,7 +113,7 @@ knitr::kable(params$adj_def_df,format="markdown") %>%
 ```
 
 
-```{r defAdj,echo=FALSE,warning=F,message=FALSE}
+```{r defAdj,echo=FALSE,warning=F,message=FALSE,fig.width=10}
 library(patchwork)
 params$defBar
 ```
