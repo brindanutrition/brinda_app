@@ -1,4 +1,5 @@
-
+# units_df <- read.csv("./BRINDA_dev/data/units.csv")
+# units <- units_df$combo
 fluidPage(
   fluidRow(
     box(
@@ -6,82 +7,93 @@ fluidPage(
       width = 10,
       status = "primary",
       solidHeader = TRUE,
+      #######################
       div(
-        selectInput("rbp","Retinol Binding Protein *",choices = NULL),
+        selectInput("ft","Ferritin",choices = ""),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("rbpU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
-        style="display:inline-block;vertical-align:top;width:200px;"),
-      div(
-        plotOutput("rbpPlot",height = 115,width = 400),
-        style="display:inline-block;vertical-align:top;"),
-      br(),
-      div(
-        selectInput("rt","Retinol *",choices = NULL),
-        style="display:inline-block;vertical-align:top;width:200px;"),
-      div(
-        selectInput("rtU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
-        style="display:inline-block;vertical-align:top;width:200px;"),
-      div(
-        plotOutput("rtPlot",height = 115,width = 400),
-        style="display:inline-block;vertical-align:top;"),
-      br(),
-      div(
-        selectInput("ft","Ferritin *",choices = NULL),
-        style="display:inline-block;vertical-align:top;width:200px;"),
-      div(
-        selectInput("ftU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("ftU","Unit",choices=c("","\u03BCg/L","ng/mL")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("ftPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("stfr","Soluble Transferrin Receptor *",choices = NULL),
+        selectInput("stfr","Soluble Transferrin Receptor",choices = ""),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("stfrU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("stfrU","Unit",choices=c("","mg/L")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("stfrPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("zn","Zinc *",choices = NULL),
+        selectInput("rt","Retinol",choices = ""),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("znU","Unit",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("rtU","Unit",choices=c("","\u03BCmol/L","\u03BCg/dL")),
+        style="display:inline-block;vertical-align:top;width:200px;"),
+      div(
+        plotOutput("rtPlot",height = 115,width = 400),
+        style="display:inline-block;vertical-align:top;"),
+      br(),
+      div(
+        selectInput("rbp","Retinol Binding Protein",choices = ""),
+        style="display:inline-block;vertical-align:top;width:200px;"),
+      div(
+        selectInput("rbpU","Unit",choices=c("","\u03BCmol/L","\u03BCg/dL")),
+        style="display:inline-block;vertical-align:top;width:200px;"),
+      div(
+        plotOutput("rbpPlot",height = 115,width = 400),
+        style="display:inline-block;vertical-align:top;"),
+      br(),
+      div(
+        selectInput("zn","Zinc",choices = ""),
+        style="display:inline-block;vertical-align:top;width:200px;"),
+      div(
+        selectInput("znU","Unit",choices=c("","\u03BCg/L","\u03BCmol/L")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("znPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("agp","AGP *",choices = NULL),
+        selectInput("agp","AGP *",choices = ""),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("agpU","Unit *",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("agpU","Unit *",choices=c("","g/L")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("agpPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
       div(
-        selectInput("crp","CRP *",choices = NULL),
+        selectInput("crp","CRP *",choices = ""),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
-        selectInput("crpU","Unit *",choices=c("","umol/L","ug/L","mg/L","g/L")),
+        selectInput("crpU","Unit *",choices=c("","mg/L")),
         style="display:inline-block;vertical-align:top;width:200px;"),
       div(
         plotOutput("crpPlot",height = 115,width = 400),
         style="display:inline-block;vertical-align:top;"),
       br(),
+      #######################
       div(
-        selectInput("fasting","Fasting Status *",choices = NULL),
-        style="display:inline-block;vertical-align:top;width:200px;"),
+        selectInput("fastingVar",
+                    "What is the general fasting status of your data? *",
+                    choices = c("fasted","non-fasted","unknown"))
+      ),
+      br(),
       div(
-        selectInput("time","Time of Day *",choices = NULL),
-        style="display:inline-block;vertical-align:top;width:200px;"),
+        selectInput("timeVar",
+                    "What is the general time of blood draw for your data? *",
+                    choices = c("morning",
+                                "afternoon",
+                                "evening",
+                                "unknown"))
+      ),
+      br(),
       div(
         selectInput("pop","Population *",choices = c("","WRA", "PSC", "Other","Manual")),
         style="display:inline-block;vertical-align:top;width:200px;"),
