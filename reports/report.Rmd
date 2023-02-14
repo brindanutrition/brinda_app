@@ -1,7 +1,12 @@
 ---
 title: "`r params$title`"
 date: "`r format(Sys.time(), '%d %B, %Y')`" 
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: simplex
 params:
   title: BRINDA Adjustment Report
   data: NULL
@@ -18,15 +23,15 @@ params:
   rtC: NULL
   ftC: NULL
   stfrC: NULL
-  zn_morn_fast_C : NULL
-  zn_morn_nonfast_C : NULL
-  zn_after_nonfast_C : NULL
+  znC : NULL
   initCut: NULL
   refAgp : NULL
   refCrp :  NULL
   adjBar : NULL
   defBar : NULL
   stats : NULL
+  init_df : NULL
+  adj_def_df : NULL
   density : NULL
 ---
 
@@ -34,33 +39,26 @@ params:
 
 The input data has `r nrow(params$data)` samples and `r ncol(params$data)` observations per sample. The following biomarkers were assigned to the column names listed below and had the following statistics:
 
-```{r results='asis',echo=FALSE}
+```{r input_data,results='hold',echo=FALSE,warning=FALSE,message=FALSE}
 library(kableExtra)
-knitr::kable(params$stats, format = "html") %>%
+knitr::kable(params$stats,format="markdown") %>%
   kable_styling()
+# knitr::kable(params$stats)
 ```
 
 
-## Initial Deficiency Cutoff
+## Initial Percent Deficiency
 
 The following cutoff was applied to the biomarkers below. Biomarkers with a level below the cutoff were considered deficient prior to the BRINDA adjustment:
 
-| Biomarker | Value Cutoff |
-|-|-|
-| Retinol Binding Protein| `r params$rbpC` |
-| Retinol | `r params$rtC` |
-| Ferritin | `r params$ftC` |
-| Soluble Transferrin Receptor | `r params$stfrC` |
-| Zinc Morning/Fasting Cutoff | `r params$zn_morn_fast_C` |
-| Zinc Morning/Non-Fasting Cutoff | `r params$zn_morn_nonfast_C` |
-| Zinc Afternoon/Non-Fasting Cutoff | `r params$zn_after_nonfast_C` |
-| AGP | 1 |
-| CRP | 5 |
-
-
+```{r init_perc_def,results='hold',echo=FALSE,warning=FALSE}
+library(kableExtra)
+knitr::kable(params$init_df,format="markdown") %>%
+  kable_styling()
+# knitr::kable(params$init_df)
+```
 
 ```{r cutoff,echo=FALSE,warning=F,message=FALSE}
-library(patchwork)
 library(ggplot2)
 
 params$initCut
@@ -95,12 +93,25 @@ if(population == "PSC"){
 
 The biomarker values have been adjusted and the difference between adjusted and unadjusted values are displayed below:
 
-```{r adjustment,echo=FALSE,warning=F,message=FALSE}
-library(patchwork)
-params$adjBar/params$density
+```{r adjustment_bar,echo=FALSE,warning=F,message=FALSE}
+params$adjBar
 ```
 
+```{r adjustment_density,echo=FALSE,warning=F,message=FALSE}
+params$density
+```
+
+## Percent Deficiency - After BRINDA Adjustment
+
 Deficiency has been recalculated below after applying the BRINDA adjustment:
+
+```{r perc_def_adj,results='hold',echo=FALSE,warning=FALSE}
+library(kableExtra)
+knitr::kable(params$adj_def_df,format="markdown") %>%
+  kable_styling()
+# knitr::kable(params$init_df)
+```
+
 
 ```{r defAdj,echo=FALSE,warning=F,message=FALSE}
 library(patchwork)
