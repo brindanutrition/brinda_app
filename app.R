@@ -1382,7 +1382,7 @@ server <- function(input, output, session) {
     }else{
       def_df <- def_df %>%
         filter(!is.na(cutoff)) %>%
-        mutate(`Value Cutoff`= ifelse(Biomarker == "Soluble Transferrin Receptor",
+        mutate(`Value Cutoff`= ifelse(grepl("Soluble Transferrin Receptor",Biomarker),
                                       paste(">",as.character(cutoff),unit),
                                       paste("<",as.character(cutoff),unit)
         )) %>%
