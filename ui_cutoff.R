@@ -10,59 +10,49 @@ fluidPage(
         tabPanel(
           title = div(icon("filter"),"Apply Cutoff"),
           column(
-            width = 4,
+            width = 8,
             br(),
             div(
               textInput("rbpC","Retinol Binding Protein Cutoff",value = 0),
               style="display:inline-block;vertical-align:top;width:250px;"),
             div(
-              verbatimTextOutput("rbpUnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
+              strong("Suggested Cutoff"),
+              verbatimTextOutput("rbpSug"),
+              style="display:inline-block;vertical-align:top;width:120px;"),
             br(),
             div(
               textInput("rtC","Retinol Cutoff",value = 0),
               style="display:inline-block;vertical-align:top;width:250px;"),
             div(
-              verbatimTextOutput("rtUnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
+              strong("Suggested Cutoff"),
+              verbatimTextOutput("rtSug"),
+              style="display:inline-block;vertical-align:top;width:120px;"),
             br(),
             div(
               textInput("ftC","Ferritin Cutoff" ,value = 0),
               style="display:inline-block;vertical-align:top;width:250px;"),
             div(
-              verbatimTextOutput("ftUnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
+              strong("Suggested Cutoff"),
+              verbatimTextOutput("ftSug"),
+              style="display:inline-block;vertical-align:top;width:120px;"),
             br(),
             div(
               textInput("stfrC","Soluble Transferrin Receptor Cutoff",value = 0),
               style="display:inline-block;vertical-align:top;width:250px;"),
             div(
-              verbatimTextOutput("stfrUnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
+              strong("Suggested Cutoff"),
+              verbatimTextOutput("stfrSug"),
+              style="display:inline-block;vertical-align:top;width:120px;"),
             br(),
             ##############
             div(
-              textInput("zn_morn_fast_C","Zinc Morning/Fasting Cutoff",value = 0),
+              textInput("znC","Zinc Cutoff",value = 0),
               style="display:inline-block;vertical-align:top;width:250px;"),
             div(
-              verbatimTextOutput("zn_morn_fast_UnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
+              strong("Suggested Cutoff"),
+              verbatimTextOutput("znSug"),
+              style="display:inline-block;vertical-align:top;width:;"),
             br(),
-            div(
-              textInput("zn_morn_nonfast_C","Zinc Morning/Non-Fasting Cutoff",value = 0),
-              style="display:inline-block;vertical-align:top;width:250px;"),
-            div(
-              verbatimTextOutput("zn_morn_nonfast_UnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
-            br(),
-            div(
-              textInput("zn_after_nonfast_C","Zinc Afternoon/Non-Fasting Cutoff",value = 0),
-              style="display:inline-block;vertical-align:top;width:250px;"),
-            div(
-              verbatimTextOutput("zn_after_nonfast_UnitC"),
-              style="display:inline-block;vertical-align:top;width:80px;padding-top:25px;"),
-            br(),
-            ############
             actionButton("setCutoff",
                          "Set Cutoff",
                          icon = icon("check"),
@@ -72,14 +62,16 @@ fluidPage(
             width = 1
           ),
           column(
-            width = 5,
+            width = 1,
             br(),
             uiOutput("defImage")
           )
         ),
         tabPanel(
           title =div(icon("chart-bar"),"Non-Adjusted Deficiency Bar Plot"),
-          plotOutput("cutoffBar")
+          plotOutput("cutoffBar"),
+          downloadButton("downloadNonAdjBar","Download Non-Adjusted Deficiency Bar Plot",
+                         style="background-color: #301014;color:white;align:right")
         )
       )
     )
