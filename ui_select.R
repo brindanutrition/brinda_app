@@ -1,5 +1,3 @@
-# units_df <- read.csv("./BRINDA_dev/data/units.csv")
-# units <- units_df$combo
 fluidPage(
   fluidRow(
     box(
