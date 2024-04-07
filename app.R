@@ -12,122 +12,25 @@ library(ggridges)
 library(BRINDA)
 library(fresh)
 
-# --- Shiny theme --------------------------------------------------------------
-mytheme <- create_theme(
-  theme = "flatly",
-  adminlte_color(
-    light_blue = "#301014"
-  ),
-  adminlte_sidebar(
-    dark_bg = "#121111",
-    dark_hover_bg = "#140708",
-    dark_color = "white",
-    width = "300px"
-  ),
-  adminlte_global(
-    content_bg = "#FFF",
-    box_bg = "white", 
-    info_box_bg = "black"
-  )
-)
 
-# --- colors -------------------------------------------------------------------
-cols <- c(
-  "#a6cee3",
-  "#1f78b4",
-  "#b2df8a",
-  "#33a02c",
-  "#fb9a99",
-  "#e31a1c",
-  "#fdbf6f",
-  "#ff7f00",
-  "#cab2d6",
-  "#6a3d9a",
-  "#b15928"
-)
+# --- Load local R module file paths --------------------------------------------
+# Styles
+source("ui/styles/color_theme.R")$value
+cols <- cols
 
-# --- header -------------------------------------------------------------------
-body <- dashboardPage(
-  dashboardHeader(
-    tags$li(class = "dropdown",
-            tags$style(".main-header {max-height: 100px;}"),
-            tags$style(".main-header .logo {height: 100px;}")),
-    title = div(
-      img(
-        id="back2main",
-        src="logo1.png",
-        style = "height:95px;")
-    )),
-  
-  # --- sidebar ----------------------------------------------------------------
-  dashboardSidebar(
-    tags$style(".left-side, .main-sidebar {padding-top: 100px;}"),
-    use_theme(mytheme),
-    width = 300,
-    sidebarMenuOutput("sidebarmenu")
-  ),
-  # --- body -------------------------------------------------------------------
-  dashboardBody(
-    tags$style("
-              body {
-    -moz-transform: scale(1.1, 1.1); /* Moz-browsers */
-    zoom: 1.1; /* Other non-webkit browsers */
-    zoom: 110%; /* Webkit browsers */
-}
-              "),
-    use_theme(mytheme),
-    tabItems(
-      # --- Import Data UI -----------------------------------------------------
-      tabItem(
-        tabName = "import",
-        source(
-          file = "ui_import.R",
-          local = TRUE,
-          encoding = "UTF-8"
-        )$value
-      ),
-      # --- Select Biomarkers UI -----------------------------------------------
-      tabItem(
-        tabName = "select",
-        source(
-          file = "ui_select.R",
-          local = TRUE,
-          encoding = "UTF-8"
-        )$value
-      ),
-      # --- Select Cutoff UI ---------------------------------------------------
-      tabItem(
-        tabName = "cutoff",
-        source(
-          file = "ui_cutoff.R",
-          local = TRUE,
-          encoding = "UTF-8"
-        )$value
-      ),
-      # --- Run BRINDA Adjustment UI -------------------------------------------
-      tabItem(
-        tabName = "brinda",
-        source(
-          file = "ui_brinda.R",
-          local = TRUE,
-          encoding = "UTF-8"
-        )$value
-      ),
-      # --- Generate Report UI -------------------------------------------------
-      tabItem(
-        tabName = "report",
-        source(
-          file = "ui_report.R",
-          local = TRUE,
-          encoding = "UTF-8"
-        )$value
-      )
-    )
-  )
-)
+# UI
+body <- source("ui/body.R")$value
+sidebar <- source("ui/sidebar.R")$value
+header <- source("ui/header.R")$value
+
+# Server
+source("server/navigation.R")$value
+observe_sidebar_transitions <- observe_sidebar_transitions
+observe_tab_navigation <- observe_tab_navigation
+
 
 # --- Shiny UI -----------------------------------------------------------------
-ui <- function(request){(body)}
+ui <- function(request){(dashboardPage(header, sidebar, body))}
 
 # --- Shiny Server -------------------------------------------------------------
 server <- function(input, output, session) {
@@ -147,215 +50,13 @@ server <- function(input, output, session) {
     df <- imported$data()
     datatable(df,options = list(scrollX = T,lengthMenu=c(5,10,25)))
   })
+
   # --- Update Sidebar depending on what step you are on -----------------------
-  observe({
-    observeEvent(1==1,{
-      output$sidebarmenu <- renderMenu({
-        sidebarMenu(
-          id = "tabs",
-          menuItem("Step 1: Import Data",
-                   tabName = "import",
-                   icon = icon("cloud-upload"),
-                   badgeLabel = "Step 1",
-                   badgeColor = "yellow",
-                   selected = T),
-          menuItem("Step 2: Select Biomarkers",
-                   tabName = "blank2",
-                   icon = icon("list"),
-                   badgeLabel = "Step 2",
-                   badgeColor = "black"),
-          menuItem("Step 3: Optional: Apply Cutoff",
-                   tabName = "blank3",
-                   icon = icon("filter"),
-                   badgeLabel = "Step 3",
-                   badgeColor = "black"),
-          menuItem("Step 4: Run BRINDA Adjustment",
-                   tabName = "blank4",
-                   icon =  icon("calculator"),
-                   badgeLabel = "Step 4",
-                   badgeColor = "black"),
-          menuItem("Step 5: Report",
-                   tabName = "blank5",
-                   icon =  icon("file"),
-                   badgeLabel = "Step 5",
-                   badgeColor = "black")
-        )
-      })
-    })
-    observeEvent(input$importData,{
-      output$sidebarmenu <- renderMenu({
-        sidebarMenu(
-          id = "tabs",
-          menuItem("Step 1: Import Data",
-                   tabName = "import",
-                   icon = icon("cloud-upload"),
-                   badgeLabel = "Step 1",
-                   badgeColor = "yellow",
-                   selected = T),
-          menuItem("Step 2: Select Biomarkers",
-                   tabName = "select",
-                   icon = icon("list"),
-                   badgeLabel = "Step 2",
-                   badgeColor = "orange"),
-          menuItem("Step 3: Optional: Apply Cutoff",
-                   tabName = "blank3",
-                   icon = icon("filter"),
-                   badgeLabel = "Step 3",
-                   badgeColor = "black"),
-          menuItem("Step 4: Run BRINDA Adjustment",
-                   tabName = "blank4",
-                   icon =  icon("calculator"),
-                   badgeLabel = "Step 4",
-                   badgeColor = "black"),
-          menuItem("Step 5: Report",
-                   tabName = "blank5",
-                   icon =  icon("file"),
-                   badgeLabel = "Step 5",
-                   badgeColor = "black")
-        )
-      })
-    })
-    observeEvent(input$setMarkers,{
-      output$sidebarmenu <- renderMenu({
-        sidebarMenu(
-          id = "tabs",
-          menuItem("Step 1: Import Data",
-                   tabName = "import",
-                   icon = icon("cloud-upload"),
-                   badgeLabel = "Step 1",
-                   badgeColor = "yellow"),
-          menuItem("Step 2: Select Biomarkers",
-                   tabName = "select",
-                   icon = icon("list"),
-                   badgeLabel = "Step 2",
-                   badgeColor = "orange",
-                   selected = T),
-          menuItem("Step 3: Optional: Apply Cutoff",
-                   tabName = "cutoff",
-                   icon = icon("filter"),
-                   badgeLabel = "Step 3",
-                   badgeColor = "maroon"),
-          menuItem("Step 4: Run BRINDA Adjustment",
-                   tabName = "blank4",
-                   icon =  icon("calculator"),
-                   badgeLabel = "Step 4",
-                   badgeColor = "black"),
-          menuItem("Step 5: Report",
-                   tabName = "blank5",
-                   icon =  icon("file"),
-                   badgeLabel = "Step 5",
-                   badgeColor = "black")
-        )
-      })
-    })
-    observeEvent(input$setCutoff,{
-      output$sidebarmenu <- renderMenu({
-        sidebarMenu(
-          id = "tabs",
-          menuItem("Step 1: Import Data",
-                   tabName = "import",
-                   icon = icon("cloud-upload"),
-                   badgeLabel = "Step 1",
-                   badgeColor = "yellow"),
-          menuItem("Step 2: Select Biomarkers",
-                   tabName = "select",
-                   icon = icon("list"),
-                   badgeLabel = "Step 2",
-                   badgeColor = "orange"),
-          menuItem("Step 3: Optional: Apply Cutoff",
-                   tabName = "cutoff",
-                   icon = icon("filter"),
-                   badgeLabel = "Step 3",
-                   badgeColor = "maroon",
-                   selected = T),
-          menuItem("Step 4: Run BRINDA Adjustment",
-                   tabName = "brinda",
-                   icon =  icon("calculator"),
-                   badgeLabel = "Step 4",
-                   badgeColor = "maroon"),
-          menuItem("Step 5: Report",
-                   tabName = "blank5",
-                   icon =  icon("file"),
-                   badgeLabel = "Step 5",
-                   badgeColor = "black")
-        )
-      })
-    })
-    observeEvent(input$applyBrinda,{
-      output$sidebarmenu <- renderMenu({
-        sidebarMenu(
-          id = "tabs",
-          menuItem("Step 1: Import Data",
-                   tabName = "import",
-                   icon = icon("cloud-upload"),
-                   badgeLabel = "Step 1",
-                   badgeColor = "yellow"),
-          menuItem("Step 2: Select Biomarkers",
-                   tabName = "select",
-                   icon = icon("list"),
-                   badgeLabel = "Step 2",
-                   badgeColor = "orange"),
-          menuItem("Step 3: Optional: Apply Cutoff",
-                   tabName = "cutoff",
-                   icon = icon("filter"),
-                   badgeLabel = "Step 3",
-                   badgeColor = "maroon"),
-          menuItem("Step 4: Run BRINDA Adjustment",
-                   tabName = "brinda",
-                   icon =  icon("calculator"),
-                   badgeLabel = "Step 4",
-                   badgeColor = "maroon",
-                   selected = T),
-          menuItem("Step 5: Report",
-                   tabName = "report",
-                   icon =  icon("file"),
-                   badgeLabel = "Step 5",
-                   badgeColor = "fuchsia")
-        )
-      })
-    })
-  })
+  observe_sidebar_transitions(input, output)
+
   # --- Update Selected Tab Based on Previous/Next Buttons ---------------------
-  observeEvent(input$prevImport,{
-    updateTabItems(session,
-                   "tabs",
-                   "import")
-  })
-  observeEvent(input$nextSelect,{
-    updateTabItems(session,
-                   "tabs",
-                   "select")
-  })
-  observeEvent(input$prevSelect,{
-    updateTabItems(session,
-                   "tabs",
-                   "select")
-  })
-  observeEvent(input$nextCutoff,{
-    updateTabItems(session,
-                   "tabs",
-                   "cutoff")
-  })
-  observeEvent(input$prevCutoff,{
-    updateTabItems(session,
-                   "tabs",
-                   "cutoff")
-  })
-  observeEvent(input$nextBrinda,{
-    updateTabItems(session,
-                   "tabs",
-                   "brinda")
-  })
-  observeEvent(input$prevBrinda,{
-    updateTabItems(session,
-                   "tabs",
-                   "brinda")
-  })
-  observeEvent(input$nextReport,{
-    updateTabItems(session,
-                   "tabs",
-                   "report")
-  })
+  observe_tab_navigation(input, output, session)
+ 
   # --- Updates Column Names Per User's Data -----------------------------------
   ## Dynamically removes options based on 
   ## user's previous choice as to not 
@@ -470,28 +171,7 @@ server <- function(input, output, session) {
       )+
       ylab("")+
       xlab(as.character(input$crpU))
-  })
- 
-  # --- Generates Pop-up when steps are completed ------------------------------
-  observe({
-    req(input$setMarkers)
-    shinyalert("DONE",
-               paste("Biomarkers were set successfully."),
-               type = "success")
-  })
-  observe({
-    req(input$setCutoff)
-    shinyalert("DONE",
-               paste("Cutoffs were set successfully."),
-               type = "success")
-  })
-  observe({
-    req(input$applyBrinda)
-    shinyalert("DONE",
-               paste("BRINDA adjustment was applied successfully."),
-               type = "success")
-  })
-  
+  }) 
   
   # --- Adds in manual AGP/CRP boxes when user selects manual population -------
   observe({
@@ -540,139 +220,12 @@ server <- function(input, output, session) {
     req(input$znU)
     input$znU
   })
-  # --- output suggested cutoffs -----------------------------------------------
-  output$rbpSug <- renderText({
-    req(input$rbp)
-    req(input$rbpU)
-    req(input$pop)
-    if(as.character(input$rbpU) == "\u03BCmol/L"){
-      cutoff="0.7 \u03BCmol/L"
-    }else if(as.character(input$rbpU) == "\u03BCg/dL"){
-      cutoff=paste(
-        as.character(0.7 * 0.03491),
-        "\u03BCg/dL"
-      )
-    }
-    return(cutoff)
-  })
-  output$rtSug <- renderText({
-    req(input$rt)
-    req(input$rtU)
-    req(input$pop)
-    if(as.character(input$rtU) == "\u03BCmol/L"){
-      cutoff="0.7 \u03BCmol/L"
-    }else if(as.character(input$rtU) == "\u03BCg/dL"){
-      cutoff=paste(
-        as.character(0.7 * 0.03491),
-        "\u03BCg/dL"
-      )
-    }
-    return(cutoff)
-  })
-  output$ftSug <- renderText({
-    req(input$ft)
-    req(input$ftU)
-    req(input$pop)
-    if(as.character(input$ftU) == "\u03BCg/L" &
-       as.character(input$pop) == "PSC"){
-      cutoff="12 \u03BCg/L"
-    }else if(as.character(input$ftU) == "\u03BCg/L" &
-             as.character(input$pop) == "WRA"){
-      cutoff="15 \u03BCg/L"
-    }else if(as.character(input$ftU) == "ng/mL" &
-             as.character(input$pop) == "PSC"){
-      cutoff="12 ng/mL"
-    }else if(as.character(input$ftU) == "ng/mL" &
-             as.character(input$pop) == "WRA"){
-      cutoff="15 ng/mL"
-    }else if(as.character(input$ftU) == "\u03BCg/L" &
-             !(as.character(input$pop) %in% c("WRA","PSC"))){
-      cutoff="12-15 \u03BCg/L"
-    }else if(as.character(input$ftU) == "ng/mL" &
-             !(as.character(input$pop) %in% c("WRA","PSC"))){
-      cutoff="12-15 ng/mL"
-    }
-    return(cutoff)
-  })
-  output$stfrSug <- renderText({
-    req(input$stfr)
-    req(input$stfrU)
-    req(input$pop)
-    if(as.character(input$stfrU) == "mg/L"){
-      cutoff="8.3 mg/L"
-    }else if(as.character(input$stfrU) == "g/L"){
-      cutoff="8.3 g/L"
-    }
-    return(cutoff)
-  })
-  "\u03BCmol/L"
-  output$znSug <- renderText({
-    req(input$zn)
-    req(input$znU)
-    req(input$pop)
-    req(input$fastingVar)
-    req(input$timeVar)
-    if(as.character(input$znU) == "\u03BCmol/L" &
-       as.character(input$pop) == "PSC" &
-       as.character(input$timeVar) == "morning"){
-      cutoff="9.9 \u03BCmol/L"
-    }else if(as.character(input$znU) == "\u03BCmol/L" &
-             as.character(input$pop) == "PSC" &
-             as.character(input$timeVar) != "morning"){
-      cutoff="8.7 \u03BCmol/L"
-    }else if(as.character(input$znU) == "\u03BCmol/L" &
-             as.character(input$pop) == "WRA" &
-             as.character(input$fastingVar) == "fasted" &
-             as.character(input$timeVar) == "morning"){
-      cutoff="10.7 \u03BCmol/L"
-    }else if(as.character(input$znU) == "\u03BCmol/L" &
-             as.character(input$pop) == "WRA" &
-             as.character(input$fastingVar) != "fasted" &
-             as.character(input$timeVar) == "morning"){
-      cutoff="10.1 \u03BCmol/L"
-    }else if(as.character(input$znU) == "\u03BCmol/L" &
-             as.character(input$pop) == "WRA" &
-             as.character(input$timeVar) != "morning"){
-      cutoff="9.0 \u03BCmol/L"
-    }else if(as.character(input$znU) == "\u03BCmol/L" &
-             !(as.character(input$pop) %in% c("WRA","PSC"))){
-      cutoff="9.3-11.3 \u03BCmol/L"
-    }
-    #########################################################
-    else if(as.character(input$znU) == "\u03BCg/L" &
-            as.character(input$pop) == "PSC" &
-            as.character(input$timeVar) == "morning"){
-      cutoff=paste(as.character(9.9*64.5),
-                   "\u03BCg/L")
-    }else if(as.character(input$znU) == "\u03BCg/L" &
-             as.character(input$pop) == "PSC" &
-             as.character(input$timeVar) != "morning"){
-      cutoff=paste(as.character(8.7*64.5),
-                   "\u03BCg/L")
-    }else if(as.character(input$znU) == "\u03BCg/L" &
-             as.character(input$pop) == "WRA" &
-             as.character(input$fastingVar) == "fasted" &
-             as.character(input$timeVar) == "morning"){
-      cutoff=paste(as.character(10.7*64.5),
-                   "\u03BCg/L")
-    }else if(as.character(input$znU) == "\u03BCg/L" &
-             as.character(input$pop) == "WRA" &
-             as.character(input$fastingVar) != "fasted" &
-             as.character(input$timeVar) == "morning"){
-      cutoff=paste(as.character(10.1*64.5),
-                   "\u03BCg/L")
-    }else if(as.character(input$znU) == "\u03BCg/L" &
-             as.character(input$pop) == "WRA" &
-             as.character(input$timeVar) != "morning"){
-      cutoff=paste(as.character(9.0*64.5),
-                   "\u03BCg/L")
-    }else if(as.character(input$znU) == "\u03BCg/L" &
-             !(as.character(input$pop) %in% c("WRA","PSC"))){
-      cutoff="599.9-728.9 \u03BCg/L"
-    }
-    return(cutoff)
-  })
-  
+
+  source("server/cutoff.R")
+  get_suggested_cutoffs <- get_suggested_cutoffs
+  # # --- output suggested cutoffs -----------------------------------------------
+  get_suggested_cutoffs(input, output)
+
   # --- Plot cutoff density plots ----------------------------------------------
   cutoffBarPlot <- function(){
     cutoff_map <- data.frame(
@@ -756,7 +309,6 @@ server <- function(input, output, session) {
     
   }
   output$cutoffBar <- renderPlot({
-    req(input$setCutoff)
     print(cutoffBarPlot())
   })
   # --- Download BRINDA adjusted barplot ---------------------------------------
@@ -770,7 +322,6 @@ server <- function(input, output, session) {
   # --- Apply BRINDA adjustment ------------------------------------------------
   ## make brinda variable available outside observe statement
   brinda <- reactive({
-    req(input$applyBrinda)
     dataset<-imported$data()
     to_map <- data.frame(
       variable=c(
@@ -832,7 +383,6 @@ server <- function(input, output, session) {
   
   # --- output brinda results table --------------------------------------------
   output$brindaTbl <- renderDataTable({
-    req(input$applyBrinda)
     req(input$pop)
     req(input$outputType)
     df <- brinda()
@@ -1462,4 +1012,5 @@ server <- function(input, output, session) {
   )
 }
 # --- Shiny Server and UI Call -------------------------------------------------
+options(shiny.autoreload = TRUE)
 shinyApp(ui, server)

@@ -1,3 +1,8 @@
+source("ui/styles/button.R")
+ButtonStyle <- ButtonStyle
+FooterNavigationButtonStyle <- FooterNavigationButtonStyle
+
+
 fluidPage(
   fluidRow(
     box(
@@ -98,30 +103,22 @@ fluidPage(
       br(),
       uiOutput("manAgp"),
       uiOutput("manCrp"),
-      actionButton("setMarkers",
-                   "Set Biomarkers",
-                   icon = icon("check"),
-                   style="background-color: #301014;color:white;"),
       br(),
-      br(),
-      strong("* required")
+      br()
     )
   ),
   fluidRow(
     div(
-      style="display:inline-block;
-            float:left;",
-      actionButton("prevImport",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickPrevOnBiomarkerPage",
                    "Previous",
                    icon = icon("backward"), 
-                   style="background-color: #301014;color:white;")),
+                   style=ButtonStyle)),
     div(
-      style="display:inline-block;
-            float:right;",
-      actionButton("nextCutoff",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickNextOnBiomarkerPage",
                    "Next",
                    icon = icon("forward"), 
-                   style="background-color: #301014;color:white;"))
+                   style=ButtonStyle))
   )
-  
 )

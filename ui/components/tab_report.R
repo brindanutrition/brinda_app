@@ -1,3 +1,8 @@
+source("ui/styles/button.R")
+ButtonStyle <- ButtonStyle
+FooterNavigationButtonStyle <- FooterNavigationButtonStyle
+
+
 fluidPage(
   fluidRow(
     box( 
@@ -9,17 +14,17 @@ fluidPage(
                    inline = TRUE),
       downloadButton("report","Generate Report",
                      icon = icon("play"),
-                     style="background-color: #301014;color:white;"),
+                     style=ButtonStyle),
       br(),
       downloadButton("downloadRes2","Download BRINDA Adjusted Data",
                      style="background-color: #301014;color:white;align:right"))
   ),
   fluidRow(
     div(
-      style="display:inline-block;float:left;",
-      actionButton("prevBrinda",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickPrevOnReportPage",
                    "Previous",
                    icon = icon("backward"), 
-                   style="background-color: #301014;color:white;"))
+                   style=ButtonStyle))
   )
 )

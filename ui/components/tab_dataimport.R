@@ -1,3 +1,8 @@
+source("ui/styles/button.R")
+ButtonStyle <- ButtonStyle
+FooterNavigationButtonStyle <- FooterNavigationButtonStyle
+
+
 fluidPage(
   fluidRow(
     box(
@@ -8,18 +13,17 @@ fluidPage(
       actionButton("importData",
                    "Step 1: Import Data",
                    icon = icon("cloud-upload"),
-                   style="background-color: #301014;color:white;"),
+                   style=ButtonStyle),
       br(""),
       dataTableOutput("table")
     )
   ),
   fluidRow(
     div(
-      style="display:inline-block;
-            float:right;",
-      actionButton("nextSelect",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickNextOnDataImportPage",
                    "Next",
                    icon = icon("forward"), 
-                   style="background-color: #301014;color:white;"))
+                   style=ButtonStyle))
   )
 )

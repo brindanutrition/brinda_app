@@ -1,0 +1,31 @@
+renderMenu({
+  sidebarMenu(
+    id = "tabs",
+    menuItem("Step 1: Import Data",
+              tabName = "DataImportTab",
+              icon = icon("cloud-upload"),
+              badgeLabel = "Step 1",
+              badgeColor = "yellow",
+              selected = T),
+    menuItem("Step 2: Select Biomarkers",
+              tabName = "BiomarkerTab",
+              icon = icon("list"),
+              badgeLabel = "Step 2",
+              badgeColor = "orange"),
+    menuItem("Step 3: Optional: Apply Cutoff",
+              tabName = "blank3",
+              icon = icon("filter"),
+              badgeLabel = "Step 3",
+              badgeColor = "black"),
+    menuItem("Step 4: Run BRINDA Adjustment",
+              tabName = "blank4",
+              icon =  icon("calculator"),
+              badgeLabel = "Step 4",
+              badgeColor = "black"),
+    menuItem("Step 5: Report",
+              tabName = "blank5",
+              icon =  icon("file"),
+              badgeLabel = "Step 5",
+              badgeColor = "black")
+  )
+})
