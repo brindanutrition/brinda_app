@@ -1,3 +1,8 @@
+source("ui/styles/button.R")
+ButtonStyle <- ButtonStyle
+FooterNavigationButtonStyle <- FooterNavigationButtonStyle
+
+
 fluidPage(
   fluidRow(
     box(
@@ -16,13 +21,6 @@ fluidPage(
                                     "only output adjusted values",
                                     "output adjusted and intermediate parameters")),
             style="display:inline-block;vertical-align:top;width:200px;"
-          ),
-          div(
-            actionButton("applyBrinda",
-                         "Apply BRINDA Adjustment",
-                         icon = icon("check"),
-                         style="background-color: #301014;color:white;"),
-            style="display:inline-block;vertical-align:top;padding-top:25px;width:200px"
           ),
           br(),
           h3("BRINDA Adjustment Table"),
@@ -49,18 +47,16 @@ fluidPage(
   ),
   fluidRow(
     div(
-      style="display:inline-block;
-            float:left;",
-      actionButton("prevCutoff",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickPrevOnBrindaPage",
                    "Previous",
                    icon = icon("backward"), 
-                   style="background-color: #301014;color:white;")),
+                   style=ButtonStyle)),
     div(
-      style="display:inline-block;
-            float:right;",
-      actionButton("nextReport",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickNextOnBrindaPage",
                    "Next",
                    icon = icon("forward"), 
-                   style="background-color: #301014;color:white;"))
+                   style=ButtonStyle))
   )
 )

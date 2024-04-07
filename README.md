@@ -2,7 +2,7 @@
 
 This is the working repository for the BRINDA Rshiny app.
 
-## Intstallation
+## Installation
 
 1. To run this app download the repo with either:
 
@@ -14,7 +14,12 @@ or go to `Code` > `Download Zip`
 
 2. Go to RStudio and go to `File` > `Open File`. Now select the `app.R` file in the folder you just downloaded
 
-3. Once the `app.R` file is loaded in RStudio click `Run App` to run
+3. Once the `app.R` file is loaded in RStudio click `Run App` to run or run the following bash command from the project root directory
+  ```bash
+  R -e "shiny::runApp('./app.R')"
+  ```
+
+
 
 ## Video Walkthrough
 

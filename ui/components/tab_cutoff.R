@@ -1,3 +1,8 @@
+source("ui/styles/button.R")
+ButtonStyle <- ButtonStyle
+FooterNavigationButtonStyle <- FooterNavigationButtonStyle
+
+
 fluidPage(
   fluidRow(
     box(
@@ -52,11 +57,7 @@ fluidPage(
               strong("Suggested Cutoff"),
               verbatimTextOutput("znSug"),
               style="display:inline-block;vertical-align:top;width:;"),
-            br(),
-            actionButton("setCutoff",
-                         "Set Cutoff",
-                         icon = icon("check"),
-                         style="background-color: #301014;color:white;")
+            br()
           ),
           column(
             width = 1
@@ -78,18 +79,16 @@ fluidPage(
   ),
   fluidRow(
     div(
-      style="display:inline-block;
-          float:left;",
-      actionButton("prevSelect",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickPrevOnCutoffPage",
                    "Previous",
                    icon = icon("backward"), 
-                   style="background-color: #301014;color:white;")),
+                   style=ButtonStyle)),
     div(
-      style="display:inline-block;
-            float:right;",
-      actionButton("nextBrinda",
+      style=FooterNavigationButtonStyle,
+      actionButton("clickNextOnCutoffPage",
                    "Next",
                    icon = icon("forward"), 
-                   style="background-color: #301014;color:white;"))
+                   style=ButtonStyle))
   )
 )
