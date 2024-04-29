@@ -1,0 +1,10 @@
+name: brinda_app
+title:
+username: brinda-app
+account: brinda-app
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11888384
+bundleId: 8553695
+url: https://brinda-app.shinyapps.io/brinda_app/
+version: 1
