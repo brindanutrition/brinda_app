@@ -176,7 +176,7 @@ server <- function(input, output, session) {
   # --- Adds in manual AGP/CRP boxes when user selects manual population -------
   observe({
     req(input$pop)
-    if(input$pop == "Manual"){
+    if(input$pop == "User-defined AGP and CRP cutoffs"){
       output$manAgp <- renderUI({
         textInput("manAgp", "Enter Manual AGP Reference Value")
       })
@@ -223,9 +223,13 @@ server <- function(input, output, session) {
 
   source("server/cutoff.R")
   get_suggested_cutoffs <- get_suggested_cutoffs
-  # # --- output suggested cutoffs -----------------------------------------------
+
+  # --- apply suggested cutoffs ----------------------------------------------- 
+  apply_suggested_cutoffs(input, output, session)
+  # --- output suggested cutoffs -----------------------------------------------
   get_suggested_cutoffs(input, output)
 
+  
   # --- Plot cutoff density plots ----------------------------------------------
   cutoffBarPlot <- function(){
     cutoff_map <- data.frame(
