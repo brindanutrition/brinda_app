@@ -2,16 +2,23 @@ source("ui/styles/button.R")
 ButtonStyle <- ButtonStyle
 FooterNavigationButtonStyle <- FooterNavigationButtonStyle
 
+source("ui/styles/dropdown.R")
+SmallDropDownDivStyle <- SmallDropDownDivStyle
+
+source("ui/styles/page.R")
+MainBoxTitleStyle <- MainBoxTitleStyle
+MainBoxWidth <- MainBoxWidth
+
 
 fluidPage(
   fluidRow(
     box(
-      title = div(icon("calculator"),"BRINDA"),
-      width = 10,
+      title = div(icon("calculator"),"BRINDA", style = MainBoxTitleStyle),
+      width = MainBoxWidth,
       status = "primary",
       solidHeader = TRUE,
       tabBox(
-        width = 10,
+        width = MainBoxWidth,
         tabPanel(
           title = div(icon("calculator"),"BRINDA"),
           div(
@@ -20,7 +27,7 @@ fluidPage(
                         choices = c("",
                                     "only output adjusted values",
                                     "output adjusted and intermediate parameters")),
-            style="display:inline-block;vertical-align:top;width:200px;"
+            style=SmallDropDownDivStyle
           ),
           br(),
           h3("BRINDA Adjustment Table"),

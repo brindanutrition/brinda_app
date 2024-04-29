@@ -2,12 +2,16 @@ source("ui/styles/button.R")
 ButtonStyle <- ButtonStyle
 FooterNavigationButtonStyle <- FooterNavigationButtonStyle
 
+source("ui/styles/page.R")
+MainBoxTitleStyle <- MainBoxTitleStyle
+MainBoxWidth <- MainBoxWidth
+
 
 fluidPage(
   fluidRow(
     box( 
-      title = div(icon("file"),"Generate Report"),
-      width = 10,
+      title = div(icon("file"),"Generate Report", style = MainBoxTitleStyle),
+      width = MainBoxWidth,
       status = "primary",
       solidHeader = TRUE,
       radioButtons('format', 'Document format', c('PDF', 'HTML', 'Word'),

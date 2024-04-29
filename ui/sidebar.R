@@ -1,6 +1,10 @@
+source("ui/styles/sidebar.R")
+SidebarStyle <- SidebarStyle
+
+
 dashboardSidebar(
-    tags$style(".left-side, .main-sidebar {padding-top: 100px;}"),
+    tags$style(SidebarStyle),
     use_theme(mytheme),
     width = 300,
     sidebarMenuOutput("sidebarmenu")
-  )
+)

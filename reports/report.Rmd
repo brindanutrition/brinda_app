@@ -70,16 +70,16 @@ Biomarker values are adjusted per population group and as such reference AGP and
 
 ```{r population,echo=FALSE,warning=F,message=FALSE}
 population = params$pop
-if(population == "PSC"){
+if(population == "Preschool-age children"){
   refAgp = "-0.52"
   refCrp = "-2.26"
-}else if(population == "WRA"){
+}else if(population == "Women of Reproductive Age"){
   refAgp = "-0.62"
   refCrp = "-1.83"
-}else if(population == "Manual"){
+}else if(population == "User-defined AGP and CRP cutoffs"){
   refAgp = "lowest decile of AGP"
   refCrp = "lowest decile of CRP"
-}else if(population == "Other"){
+}else if(population == "Other (non-WRA, non-PSC population group)"){
   refAgp = params$refAgp
   refCrp = params$refCrp
 }

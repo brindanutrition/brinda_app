@@ -2,12 +2,17 @@ source("ui/styles/button.R")
 ButtonStyle <- ButtonStyle
 FooterNavigationButtonStyle <- FooterNavigationButtonStyle
 
+source("ui/styles/page.R")
+MainBoxTitleStyle <- MainBoxTitleStyle
+MainBoxWidth <- MainBoxWidth
+
+
 
 fluidPage(
   fluidRow(
     box(
-      title=div(icon("table"),"Data Table"),
-      width = 10,
+      title=div(icon("table"),"Data Table", style = MainBoxTitleStyle),
+      width = MainBoxWidth,
       color="#301014",
       status = "primary", solidHeader = TRUE,
       actionButton("importData",
