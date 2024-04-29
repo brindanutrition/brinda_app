@@ -4,7 +4,7 @@
             tags$style(".main-header .logo {height: 100px;}")),
     title = div(
       img(
-        id="back2main",
+        id="Brinda App",
         src="logo1.png",
         style = "height:95px;")
 ))

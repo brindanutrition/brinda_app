@@ -1,4 +1,6 @@
 dashboardBody(
+  tags$head(
+    tags$link(rel = "shortcut icon", href = "favicon.ico")),
   tags$style("body {
       -moz-transform: scale(1.1, 1.1); /* Moz-browsers */
       zoom: 1.1; /* Other non-webkit browsers */
