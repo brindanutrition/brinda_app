@@ -37,7 +37,7 @@ or go to `Code` > `Download Zip`
   ```bash
   rsconnect::setAccountInfo(name='brinda-app',
     token='7600FCD588C7B1297B15EF27BAD5C023',
-    secre='<secret key>')
+    secret='<secret key>')
   ```
 5. Run the following command in the terminal to deploy the app.
   ```bash
