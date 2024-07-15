@@ -41,7 +41,7 @@ The input data has `r nrow(params$data)` samples and `r ncol(params$data)` obser
 
 ```{r input_data,results='hold',echo=FALSE,warning=FALSE,message=FALSE}
 library(kableExtra)
-knitr::kable(params$stats,format="markdown") %>%
+knitr::kable(params$stats, format = "markdown") %>%
   kable_styling()
 # knitr::kable(params$stats)
 ```
@@ -53,7 +53,7 @@ The following cutoff was applied to the biomarkers below. Biomarkers with a leve
 
 ```{r init_perc_def,results='hold',echo=FALSE,warning=FALSE}
 library(kableExtra)
-knitr::kable(params$init_df,format="markdown") %>%
+knitr::kable(params$init_df, format = "markdown") %>%
   kable_styling()
 # knitr::kable(params$init_df)
 ```
@@ -69,19 +69,19 @@ params$initCut
 Biomarker values are adjusted per population group and as such reference AGP and CRP values are set accordingly. The population group, reference AGP, and reference CRP were set to the following:
 
 ```{r population,echo=FALSE,warning=F,message=FALSE}
-population = params$pop
-if(population == "Preschool-age children"){
-  refAgp = "-0.52"
-  refCrp = "-2.26"
-}else if(population == "Women of Reproductive Age"){
-  refAgp = "-0.62"
-  refCrp = "-1.83"
-}else if(population == "User-defined AGP and CRP cutoffs"){
-  refAgp = "lowest decile of AGP"
-  refCrp = "lowest decile of CRP"
-}else if(population == "Other (non-WRA, non-PSC population group)"){
-  refAgp = params$refAgp
-  refCrp = params$refCrp
+population <- params$pop
+if (population == "Preschool-age children") {
+  refAgp <- "-0.52"
+  refCrp <- "-2.26"
+} else if (population == "Women of Reproductive Age") {
+  refAgp <- "-0.62"
+  refCrp <- "-1.83"
+} else if (population == "User-defined AGP and CRP cutoffs") {
+  refAgp <- "lowest decile of AGP"
+  refCrp <- "lowest decile of CRP"
+} else if (population == "Other (non-WRA, non-PSC population group)") {
+  refAgp <- params$refAgp
+  refCrp <- params$refCrp
 }
 ```
 
@@ -107,7 +107,7 @@ Deficiency has been recalculated below after applying the BRINDA adjustment:
 
 ```{r perc_def_adj,results='hold',echo=FALSE,warning=FALSE}
 library(kableExtra)
-knitr::kable(params$adj_def_df,format="markdown") %>%
+knitr::kable(params$adj_def_df, format = "markdown") %>%
   kable_styling()
 # knitr::kable(params$init_df)
 ```
