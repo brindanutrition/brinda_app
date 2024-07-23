@@ -133,10 +133,47 @@ fluidPage(
         ),
         style = LargeDropDownDivStyle
       ),
-      uiOutput("sameBloodDrawFastingVarSelection"),
       uiOutput("sameBloodDrawTimeVarSelection"),
-      uiOutput("differentBloodDrawFastingVarColumnName"),
       uiOutput("differentBloodDrawTimeVarColumnName"),
+      div(
+        uiOutput("differentBloodDrawTimeVarMorningValue"),
+        style = SmallDropDownDivStyle
+      ),
+      div(
+        uiOutput("differentBloodDrawTimeVarAfternoonValue"),
+        style = SmallDropDownDivStyle
+      ),
+      div(
+        uiOutput("differentBloodDrawTimeVarEveningValue"),
+        style = SmallDropDownDivStyle
+      ),
+      div(
+        uiOutput("differentBloodDrawTimeVarUnknownValue"),
+        style = SmallDropDownDivStyle
+      ),
+      div(
+        selectInput(
+          "fastingSameStatus",
+          "Were the fasting status for every participant same? *",
+          choices = c("yes", "no"),
+        ),
+        style = LargeDropDownDivStyle
+      ),
+      br(),
+      uiOutput("sameBloodDrawFastingVarSelection"),
+      uiOutput("differentBloodDrawFastingVarColumnName"),
+      div(
+        uiOutput("differentBloodDrawFastingVarFastedValue"),
+        style = SmallDropDownDivStyle
+      ),
+      div(
+        uiOutput("differentBloodDrawFastingVarNonFastedValue"),
+        style = SmallDropDownDivStyle
+      ),
+      div(
+        uiOutput("differentBloodDrawFastingVarUnknownValue"),
+        style = SmallDropDownDivStyle
+      ),
       uiOutput("manAgp"),
       uiOutput("manCrp"),
       br()
