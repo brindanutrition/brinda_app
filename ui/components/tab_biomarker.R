@@ -22,6 +22,8 @@ fluidPage(
       status = "primary",
       solidHeader = TRUE,
       #######################
+      # Select Biomarkers
+      #######################
       div(
         selectInput("ft", "Ferritin", choices = ""),
         style = SmallDropDownDivStyle
@@ -114,64 +116,72 @@ fluidPage(
       ),
       br(),
       #######################
+      # Select Population
+      #######################
       div(
         selectInput("pop", "Population *", choices = c(
-          "",
           "Women of Reproductive Age",
-          "Preschool-age children", "Other (non-WRA, non-PSC population group)",
+          "Preschool-age children",
+          "Other (non-WRA, non-PSC population group)",
           "User-defined AGP and CRP cutoffs"
         )),
         style = MediumDropDownDivStyle
       ),
       br(),
+      #######################
+      # Select Blood Draw Time
+      #######################
       div(
         selectInput(
-          "bloodDrawSameTime",
+          "same_bdt",
           "Were the blood draw for every participant
           taken at the same time of day? *",
           choices = c("yes", "no"),
         ),
         style = LargeDropDownDivStyle
       ),
-      uiOutput("sameBloodDrawTimeVarSelection"),
-      uiOutput("differentBloodDrawTimeVarColumnName"),
+      uiOutput("same_bdt_ui_selector"),
+      uiOutput("diff_bdt_column_ui_selector"),
       div(
-        uiOutput("differentBloodDrawTimeVarMorningValue"),
+        uiOutput("diff_bdt_morning_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
       div(
-        uiOutput("differentBloodDrawTimeVarAfternoonValue"),
+        uiOutput("diff_bdt_afternoon_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
       div(
-        uiOutput("differentBloodDrawTimeVarEveningValue"),
+        uiOutput("diff_bdt_evening_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
       div(
-        uiOutput("differentBloodDrawTimeVarUnknownValue"),
+        uiOutput("diff_bdt_unknown_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
+      #######################
+      # Select Fasting Status
+      #######################
       div(
         selectInput(
-          "fastingSameStatus",
+          "same_fs",
           "Were the fasting status for every participant same? *",
           choices = c("yes", "no"),
         ),
         style = LargeDropDownDivStyle
       ),
       br(),
-      uiOutput("sameBloodDrawFastingVarSelection"),
-      uiOutput("differentBloodDrawFastingVarColumnName"),
+      uiOutput("same_fs_ui_selector"),
+      uiOutput("diff_fs_column_ui_selector"),
       div(
-        uiOutput("differentBloodDrawFastingVarFastedValue"),
+        uiOutput("diff_fs_fasted_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
       div(
-        uiOutput("differentBloodDrawFastingVarNonFastedValue"),
+        uiOutput("diff_fs_nonfasted_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
       div(
-        uiOutput("differentBloodDrawFastingVarUnknownValue"),
+        uiOutput("diff_fs_unknown_val_ui_selector"),
         style = SmallDropDownDivStyle
       ),
       uiOutput("manAgp"),
@@ -179,6 +189,9 @@ fluidPage(
       br()
     )
   ),
+  #######################
+  # Footer Navigation
+  #######################
   fluidRow(
     div(
       style = FooterNavigationButtonStyle,

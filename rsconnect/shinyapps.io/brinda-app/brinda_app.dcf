@@ -5,6 +5,6 @@ account: brinda-app
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 11888384
-bundleId: 8865652
+bundleId: 8917386
 url: https://brinda-app.shinyapps.io/brinda_app/
 version: 1

@@ -32,8 +32,20 @@ source("server/constants.R")$value
 find_population_code_name <- find_population_code_name
 
 source("server/biomarker.R")$value
-observe_biomarker_population_selection <- observe_biomarker_population_selection
+observe_agp_crp_selection <- observe_agp_crp_selection
 
+observe_blood_draw_time_selection <- observe_blood_draw_time_selection
+observe_blood_draw_time_vals_selection <- observe_blood_draw_time_vals_selection
+observe_blood_draw_time_vals_update <- observe_blood_draw_time_vals_update
+
+observe_fasting_status_selection <- observe_fasting_status_selection
+observe_fasting_status_vals_selection <- observe_fasting_status_vals_selection
+observe_fasting_status_vals_update <- observe_fasting_status_vals_update
+
+source("server/cutoff.R")
+get_suggested_cutoffs <- get_suggested_cutoffs
+apply_suggested_cutoffs <- apply_suggested_cutoffs
+calculate_dynamic_zinc_cutoff <- calculate_dynamic_zinc_cutoff
 
 # --- Shiny UI -----------------------------------------------------------------
 ui <- function(request) {
@@ -66,7 +78,18 @@ server <- function(input, output, session) {
   observe_tab_navigation(input, output, session)
 
   # --- Biomarker Tab Dynamic Input Selection ----------------------------------
-  observe_biomarker_population_selection(input, output, session)
+  observe_agp_crp_selection(input, output, session)
+  observe_blood_draw_time_selection(input, output, session)
+  observe_blood_draw_time_vals_selection(input, output, session)
+  observe_blood_draw_time_vals_update(input, output, session, imported)
+
+  observe_fasting_status_selection(input, output, session)
+  observe_fasting_status_vals_selection(input, output, session)
+  observe_fasting_status_vals_update(input, output, session, imported)
+
+  # --- Calculate dynamic zinc cutoff ------------------------------------------
+  calculate_dynamic_zinc_cutoff(input, output, session, imported)
+
 
   # --- Updates Column Names Per User's Data -----------------------------------
   ## Dynamically removes options based on
@@ -222,11 +245,9 @@ server <- function(input, output, session) {
     input$znU
   })
 
-  source("server/cutoff.R")
-  get_suggested_cutoffs <- get_suggested_cutoffs
-
   # --- apply suggested cutoffs -----------------------------------------------
   apply_suggested_cutoffs(input, output, session)
+
   # --- output suggested cutoffs -----------------------------------------------
   get_suggested_cutoffs(input, output)
 

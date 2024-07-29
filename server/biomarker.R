@@ -2,12 +2,9 @@ source("ui/styles/dropdown.R")
 MediumDropDownDivStyle <- MediumDropDownDivStyle
 
 
-observe_biomarker_population_selection <- function(input, output, session) {
+observe_agp_crp_selection <- function(input, output, session) {
     observe({
         req(input$pop)
-        req(input$bloodDrawSameTime)
-
-
         if (input$pop == "User-defined AGP and CRP cutoffs") {
             output$manAgp <- renderUI({
                 textInput("manAgp", "Enter Manual AGP Reference Value")
@@ -19,49 +16,22 @@ observe_biomarker_population_selection <- function(input, output, session) {
             output$manAgp <- renderUI({})
             output$manCrp <- renderUI({})
         }
+    })
+}
 
-        # FASTING STATUS
-        if (input$fastingSameStatus == "yes") {
-            # updateTextInput(session, "differentBloodDrawFastingVarColumnName", value = "")
-            output$differentBloodDrawFastingVarColumnName <- renderUI({})
 
-            output$sameBloodDrawFastingVarSelection <- renderUI({
-                div(
-                    selectInput("fastingVar",
-                        "What is the general fasting status of your data? *",
-                        choices = c("fasted", "non-fasted", "unknown")
-                    ),
-                    style = MediumDropDownDivStyle
-                )
-            })
 
-            output$differentBloodDrawFastingVarFastedValue <- renderUI({})
-            output$differentBloodDrawFastingVarNonFastedValue <- renderUI({})
-            output$differentBloodDrawFastingVarUnknownValue <- renderUI({})
-        } else if (input$fastingSameStatus == "no") {
-            # updateTextInput(session, "fastingVar", value = "unknown")
-            output$sameBloodDrawFastingVarSelection <- renderUI({})
+#######################
+# UI Rendering Functions
+#######################
+observe_blood_draw_time_selection <- function(input, output, session) {
+    observe({
+        req(input$pop)
+        req(input$same_bdt)
 
-            output$differentBloodDrawFastingVarColumnName <- renderUI({
-                textInput("differentBloodDrawFastingVarColumnName", "What's the column name in the dataset indicating fasting status?")
-            })
-
-            output$differentBloodDrawFastingVarFastedValue <- renderUI({
-                textInput("differentBloodDrawFastingVarFastedValue", "\"Fasted\" Value", value = 1)
-            })
-            output$differentBloodDrawFastingVarNonFastedValue <- renderUI({
-                textInput("differentBloodDrawFastingVarNonFastedValue", "\"Non-Fasted\" Value", value = 0)
-            })
-            output$differentBloodDrawFastingVarUnknownValue <- renderUI({
-                textInput("differentBloodDrawFastingVarUnknownValue", "\"Evening\" Value", value = 0)
-            })
-        }
-
-        # BLOOD DRAW TIME
-        if (input$bloodDrawSameTime == "yes") {
-            # updateTextInput(session, "differentBloodDrawTimeVarColumnName", value = "")
-            output$differentBloodDrawTimeVarColumnName <- renderUI({})
-            output$sameBloodDrawTimeVarSelection <- renderUI({
+        if (input$same_bdt == "yes") {
+            # Display the static blood draw time selection dropdown
+            output$same_bdt_ui_selector <- renderUI({
                 div(
                     selectInput("timeVar",
                         "What is the general time of blood draw for your data? *",
@@ -75,28 +45,172 @@ observe_biomarker_population_selection <- function(input, output, session) {
                     style = MediumDropDownDivStyle
                 )
             })
-            output$differentBloodDrawTimeVarMorningValue <- renderUI({})
-            output$differentBloodDrawTimeVarAfternoonValue <- renderUI({})
-            output$differentBloodDrawTimeVarEveningValue <- renderUI({})
-            output$differentBloodDrawTimeVarUnknownValue <- renderUI({})
-        } else if (input$bloodDrawSameTime == "no") {
-            # updateTextInput(session, "timeVar", value = "unknown")
-            output$sameBloodDrawTimeVarSelection <- renderUI({})
-            output$differentBloodDrawTimeVarColumnName <- renderUI({
-                textInput("differentBloodDrawTimeVarColumnName", "What's the column name in the dataset indicating time of blood draw?")
-            })
-            output$differentBloodDrawTimeVarMorningValue <- renderUI({
-                textInput("differentBloodDrawTimeVarMorningValue", "\"Morning\" Value", value = 1)
-            })
-            output$differentBloodDrawTimeVarAfternoonValue <- renderUI({
-                textInput("differentBloodDrawTimeVarAfternoonValue", "\"Afternoon\" Value", value = 0)
-            })
-            output$differentBloodDrawTimeVarEveningValue <- renderUI({
-                textInput("differentBloodDrawTimeVarEveningValue", "\"Evening\" Value", value = 0)
-            })
-            output$differentBloodDrawTimeVarUnknownValue <- renderUI({
-                textInput("differentBloodDrawTimeVarUnknownValue", "\"Unknown\" Value", value = 0)
+
+            # Set custom column name and value selection UI to empty
+            output$diff_bdt_column_ui_selector <- renderUI({})
+            output$diff_bdt_morning_val_ui_selector <- renderUI({})
+            output$diff_bdt_afternoon_val_ui_selector <- renderUI({})
+            output$diff_bdt_evening_val_ui_selector <- renderUI({})
+            output$diff_bdt_unknown_val_ui_selector <- renderUI({})
+        } else if (input$same_bdt == "no") {
+            # Set the static blood draw time selection dropdown to empty
+            output$same_bdt_ui_selector <- renderUI({})
+
+            # Display the custom column name and value selection UI
+            output$diff_bdt_column_ui_selector <- renderUI({
+                selectInput("diff_bdt_column", "What's the column name in the dataset indicating time of blood draw?", choices = "")
             })
         }
+    })
+}
+
+observe_blood_draw_time_vals_selection <- function(input, output, session) {
+    observe({
+        req(input$diff_bdt_column)
+        if (input$same_bdt == "no" && input$diff_bdt_column != "") {
+            output$diff_bdt_morning_val_ui_selector <- renderUI({
+                selectInput("diff_bdt_morning_val", "\"Morning\" Value", choices = "")
+            })
+            output$diff_bdt_afternoon_val_ui_selector <- renderUI({
+                selectInput("diff_bdt_afternoon_val", "\"Afternoon\" Value", choices = "")
+            })
+            output$diff_bdt_evening_val_ui_selector <- renderUI({
+                selectInput("diff_bdt_evening_val", "\"Evening\" Value", choices = "")
+            })
+            output$diff_bdt_unknown_val_ui_selector <- renderUI({
+                selectInput("diff_bdt_unknown_val", "\"Unknown\" Value", choices = "")
+            })
+        } else {
+            output$diff_bdt_morning_val_ui_selector <- renderUI({})
+            output$diff_bdt_afternoon_val_ui_selector <- renderUI({})
+            output$diff_bdt_evening_val_ui_selector <- renderUI({})
+            output$diff_bdt_unknown_val_ui_selector <- renderUI({})
+        }
+    })
+}
+
+observe_fasting_status_selection <- function(input, output, session) {
+    observe({
+        req(input$pop)
+        req(input$same_fs)
+
+        # FASTING STATUS
+        if (input$same_fs == "yes") {
+            # Display the static fasting status selection dropdown
+            output$same_fs_ui_selector <- renderUI({
+                div(
+                    selectInput("fastingVar",
+                        "What is the general fasting status of your data? *",
+                        choices = c("fasted", "non-fasted", "unknown")
+                    ),
+                    style = MediumDropDownDivStyle
+                )
+            })
+
+            # Set custom column name and value selection UI to empty
+            output$diff_fs_column_ui_selector <- renderUI({})
+            output$diff_fs_fasted_val_ui_selector <- renderUI({})
+            output$diff_fs_nonfasted_val_ui_selector <- renderUI({})
+            output$diff_fs_unknown_val_ui_selector <- renderUI({})
+        } else if (input$same_fs == "no") {
+            # Set the static fasting status selection dropdown to empty
+            output$same_fs_ui_selector <- renderUI({})
+
+            # Display the custom column name and value selection UI
+            output$diff_fs_column_ui_selector <- renderUI({
+                selectInput("diff_fs_column", "What's the column name in the dataset indicating fasting status?", choices = "")
+            })
+        }
+    })
+}
+
+observe_fasting_status_vals_selection <- function(input, output, session) {
+    observe({
+        req(input$diff_fs_column)
+        if (input$same_fs == "no" && input$diff_fs_column != "") {
+            output$diff_fs_fasted_val_ui_selector <- renderUI({
+                selectInput("diff_fs_fasted_val", "\"Fasted\" Value", choices = "")
+            })
+            output$diff_fs_nonfasted_val_ui_selector <- renderUI({
+                selectInput("diff_fs_nonfasted_val", "\"Non-Fasted\" Value", choices = "")
+            })
+            output$diff_fs_unknown_val_ui_selector <- renderUI({
+                selectInput("diff_fs_unknown_val", "\"Unknown\" Value", choices = "")
+            })
+        } else {
+            output$diff_fs_fasted_val_ui_selector <- renderUI({})
+            output$diff_fs_nonfasted_val_ui_selector <- renderUI({})
+            output$diff_fs_unknown_val_ui_selector <- renderUI({})
+        }
+    })
+}
+
+#######################
+# Value Update Functions
+#######################
+observe_blood_draw_time_vals_update <- function(input, output, session, imported) {
+    observe({
+        updateSelectInput(session, "diff_bdt_column",
+            choices = c("", names(imported$data())[!(names(imported$data()) %in% c(input$rt, input$ft, input$stfr, input$zn, input$agp, input$crp, input$fasting, input$time))]),
+            selected = input$diff_bdt_column
+        )
+    })
+    observe({
+        req(input$diff_bdt_column)
+        updateSelectInput(session, "diff_bdt_morning_val",
+            choices = c("", imported$data()[input$diff_bdt_column]),
+            selected = input$diff_bdt_morning_val
+        )
+    })
+    observe({
+        req(input$diff_bdt_column)
+        updateSelectInput(session, "diff_bdt_afternoon_val",
+            choices = c("", imported$data()[input$diff_bdt_column]),
+            selected = input$diff_bdt_afternoon_val
+        )
+    })
+    observe({
+        req(input$diff_bdt_column)
+        updateSelectInput(session, "diff_bdt_evening_val",
+            choices = c("", imported$data()[input$diff_bdt_column]),
+            selected = input$diff_bdt_evening_val
+        )
+    })
+    observe({
+        req(input$diff_bdt_column)
+        updateSelectInput(session, "diff_bdt_unknown_val",
+            choices = c("", imported$data()[input$diff_bdt_column]),
+            selected = input$diff_bdt_unknown_val
+        )
+    })
+}
+
+observe_fasting_status_vals_update <- function(input, output, session, imported) {
+    observe({
+        updateSelectInput(session, "diff_fs_column",
+            choices = c("", names(imported$data())[!(names(imported$data()) %in% c(input$rt, input$ft, input$stfr, input$zn, input$agp, input$crp, input$fasting, input$time))]),
+            selected = input$diff_fs_column
+        )
+    })
+    observe({
+        req(input$diff_fs_column)
+        updateSelectInput(session, "diff_fs_fasted_val",
+            choices = c("", imported$data()[input$diff_fs_column]),
+            selected = input$diff_fs_fasted_val
+        )
+    })
+    observe({
+        req(input$diff_fs_column)
+        updateSelectInput(session, "diff_fs_nonfasted_val",
+            choices = c("", imported$data()[input$diff_fs_column]),
+            selected = input$diff_fs_nonfasted_val
+        )
+    })
+    observe({
+        req(input$diff_fs_column)
+        updateSelectInput(session, "diff_fs_unknown_val",
+            choices = c("", imported$data()[input$diff_fs_column]),
+            selected = input$diff_fs_unknown_val
+        )
     })
 }
