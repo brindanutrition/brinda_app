@@ -308,3 +308,73 @@ apply_suggested_cutoffs <- function(input, output, session){
       }
   })
 }
+
+
+calculate_dynamic_zinc_cutoff <- function(input, output, session, imported){
+    observeEvent(input$clickNextOnBiomarkerPage, {
+    df <- as.data.frame(imported$data())
+    print(df)
+    input_population <- find_population_code_name(input$pop)
+
+    print("\n\n======================>")
+    print(input_population)
+    print(input$diff_bdt_column)
+    print(input$diff_bdt_morning_val)
+    print(input$diff_bdt_afternoon_val)
+    print(input$diff_bdt_evening_val)
+    print(input$diff_bdt_unknown_val)
+    print(input$diff_fs_column)
+    print(input$diff_fs_fasted_val)
+    print(input$diff_fs_nonfasted_val)
+    print(input$diff_fs_unknown_val)
+    print("======================>\n\n")
+
+    calculate_zn <- function(row) {
+      blood_draw_time <- ""
+      fasting_status <- ""
+
+      # Derive blood draw time
+      if (input$same_bdt == "yes") {
+        if (input$timeVar == "morning") {
+          blood_draw_time <- "morning"
+        } else {
+          blood_draw_time <- "non_morning"
+        }
+      } else {
+        if (input$diff_bdt_column != "" && !is.null(input$diff_bdt_column)) {
+          if (row[input$diff_bdt_column] == input$diff_bdt_morning_val) {
+            blood_draw_time <- "morning"
+          } else {
+            blood_draw_time <- "not_morning"
+          }
+        } else {
+          blood_draw_time <- "non_morning"
+        }
+      }
+
+      # Derive fasting status
+      if (input$same_fs == "yes") {
+        if (input$fastingVar == "fasted") {
+          fasting_status <- "fasted"
+        } else {
+          fasting_status <- "non_fasted"
+        }
+      } else {
+        if (input$diff_fs_column != "" && !is.null(input$diff_fs_column)) {
+          if (row[input$diff_fs_column] == input$diff_fs_fasted_val) {
+            fasting_status <- "fasted"
+          } else {
+            fasting_status <- "non_fasted"
+          }
+        } else {
+          fasting_status <- "non_fasted"
+        }
+      }
+    }
+
+
+
+    result <- t(apply(df, 1, function(row) calculate_zn(row)))
+    print(result)
+  })
+}
