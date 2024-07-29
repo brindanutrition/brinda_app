@@ -90,7 +90,6 @@ server <- function(input, output, session) {
   # --- Calculate dynamic zinc cutoff ------------------------------------------
   calculate_dynamic_zinc_cutoff(input, output, session, imported)
 
-
   # --- Updates Column Names Per User's Data -----------------------------------
   ## Dynamically removes options based on
   ## user's previous choice as to not
@@ -250,7 +249,6 @@ server <- function(input, output, session) {
 
   # --- output suggested cutoffs -----------------------------------------------
   get_suggested_cutoffs(input, output)
-
 
   # --- Plot cutoff density plots ----------------------------------------------
   cutoffBarPlot <- function() {
