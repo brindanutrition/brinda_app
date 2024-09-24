@@ -1094,4 +1094,5 @@ server <- function(input, output, session) {
 }
 # --- Shiny Server and UI Call -------------------------------------------------
 options(shiny.autoreload = TRUE)
+options(shiny.maxRequestSize = 300 * 1024^2) # 300 MB
 shinyApp(ui, server)
